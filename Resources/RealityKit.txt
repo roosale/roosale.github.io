@@ -1,0 +1,2792 @@
+import ARKit
+import Combine
+import CoreGraphics
+import Foundation
+import GroupActivities
+import Metal
+import MultipeerConnectivity
+import ObjectiveC
+import RealityFoundation
+import UIKit
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+import simd
+
+@available(macOS 14.0, iOS 17.0, *)
+public enum AccessibilityEvents {
+
+    /// An accessibility event associated with a rotor navigation.
+    @available(iOS 17.0, *)
+    @available(macOS, unavailable)
+    @MainActor @preconcurrency public struct RotorNavigation : Event {
+
+        /// The type of the rotor associated with the event.
+        @MainActor @preconcurrency public let rotorType: AccessibilityComponent.RotorType
+
+        /// The entity containing the component declaring support for this rotor type.
+        @MainActor @preconcurrency public let hostEntity: Entity
+
+        /// The current element of the search.
+        @MainActor @preconcurrency public let currentItem: Any?
+
+        /// The direction in which to search.
+        @MainActor @preconcurrency public let searchDirection: UIAccessibilityCustomRotor.Direction
+
+        /// The handler for the result of the current search. When observing RotorNavigation events
+        @MainActor @preconcurrency public let resultHandler: (Any) -> Void
+
+        @MainActor @preconcurrency public init(rotorType: AccessibilityComponent.RotorType, hostEntity: Entity, currentItem: Any?, searchDirection: UIAccessibilityCustomRotor.Direction, resultHandler: @escaping (Any) -> Void)
+    }
+
+    /// An accessibility event for activating an accessibility element.
+    public struct Activate : Event {
+
+        /// The receiver of the action.
+        public var entity: Entity
+
+        public init(entity: Entity)
+    }
+
+    /// An accessibility event for incrementing an accessibility element.
+    public struct Increment : Event {
+
+        /// The receiver of the action.
+        public var entity: Entity
+
+        public init(entity: Entity)
+    }
+
+    /// An accessibility event for decrementing an accessibility element.
+    public struct Decrement : Event {
+
+        /// The receiver of the action.
+        public var entity: Entity
+
+        public init(entity: Entity)
+    }
+
+    /// An accessibility event for a custom action defined in your app.
+    public struct CustomAction : Event {
+
+        /// The localized string key identifying this action.
+        public var key: LocalizedStringResource
+
+        /// The receiver of the action.
+        public var entity: Entity
+
+        public init(key: LocalizedStringResource, entity: Entity)
+    }
+}
+
+/// The color parameter applied to a material.
+@available(macOS 10.15, iOS 13.0, *)
+public enum MaterialColorParameter : Hashable {
+
+    /// A color value in macOS.
+    case color(UIColor)
+
+    /// A texture resource.
+    case texture(TextureResource)
+
+    /// Indicates whether two color parameters are equal.
+    ///
+    /// - Parameters:
+    ///   - lhs: The first color parameter to compare.
+    ///
+    ///   - rhs: The second color parameter to compare.
+    ///
+    /// - Returns: A Boolean value set to `true` if the two color parameters are
+    /// equal.
+    public static func == (lhs: MaterialColorParameter, rhs: MaterialColorParameter) -> Bool
+
+    /// Hashes the essential components of the color parameter by feeding them
+    /// into the given hash function.
+    ///
+    /// - Parameters:
+    ///   - hasher: The hash function to use when combining the components of the
+    ///     color parameter.
+    public func hash(into hasher: inout Hasher)
+
+    /// The hash value.
+    ///
+    /// Hash values are not guaranteed to be equal across different executions of
+    /// your program. Do not save hash values to use during a future execution.
+    ///
+    /// - Important: `hashValue` is deprecated as a `Hashable` requirement. To
+    ///   conform to `Hashable`, implement the `hash(into:)` requirement instead.
+    ///   The compiler provides an implementation for `hashValue` for you.
+    public var hashValue: Int { get }
+}
+
+@available(macOS 15.0, iOS 18.0, visionOS 2.0, *)
+extension Entity.ConfigurationCatalog {
+
+    /// Loads a configuration catalog from a USD or reality file.
+    ///
+    /// This method parses a USD or `.reality` file, and provides a collection of available
+    /// configurations based on USD variant sets or `.reality` file configurations. It doesn't
+    /// load large asset files, such as textures and meshes.
+    ///
+    /// You can load an entity, and its assets, with configuration choices by calling
+    /// ``Entity/init(from:configurations:)``.
+    ///
+    /// - Parameters:
+    ///     - url: A URL of a USD or `.reality` file.
+    public init(from url: URL) async throws
+}
+
+@available(visionOS 1.0, macOS 15.0, iOS 18.0, *)
+extension TextComponent {
+
+    public typealias EdgeInsets = UIEdgeInsets
+
+    public var edgeInsets: TextComponent.EdgeInsets
+}
+
+@available(macOS 10.15, iOS 13.0, *)
+extension MeshResource {
+
+    /// A platform-specific type that represents a font for use in
+    /// generating a text mesh.
+    public typealias Font = UIFont
+}
+
+@available(macOS 10.15, iOS 13.0, *)
+extension MeshResource {
+
+    /// Generates a 3D mesh for rendering static text.
+    ///
+    /// - Parameters:
+    ///   - string: The text to render.
+    ///
+    ///   - extrusionDepth: The extent, in meters, of the extruded text in the
+    ///     z-axis direction.
+    ///
+    ///   - font: The font to use. The font size is in meters.
+    ///
+    ///   - containerFrame: The size, in meters, of the text frame in the local
+    ///     coordinate system where the text is laid out. The text frame has the
+    ///     same origin as the local coordinate system.
+    ///
+    ///     Use a frame size of `(0,0)` to tell the method to create a frame large enough to
+    ///     contain the generated text.
+    ///
+    ///   - alignment: How the text should be aligned in the text frame.
+    ///
+    ///   - lineBreakMode: How the text should wrap when reaching a frame
+    ///     boundary.
+    ///
+    /// - Returns: The text mesh.
+    @MainActor @preconcurrency public static func generateText(_ string: String, extrusionDepth: Float = 0.25, font: MeshResource.Font = .systemFont(ofSize: MeshResource.Font.systemFontSize), containerFrame: CGRect = CGRect.zero, alignment: CTTextAlignment = .left, lineBreakMode: CTLineBreakMode = .byTruncatingTail) -> MeshResource
+}
+
+@available(visionOS 1.0, macOS 15.0, iOS 18.0, *)
+extension ParticleEmitterComponent.ParticleEmitter {
+
+    public typealias Color = UIColor
+
+    /// Options for specifying the behavior of the color of the particles.
+    public enum ParticleColor : Equatable {
+
+        /// Options for specifying whether the particle color is a single color, or if the particle should take a random color in the given range.
+        public enum ColorValue : Equatable {
+
+            /// The particle will be the given Color.
+            case single(ParticleEmitterComponent.ParticleEmitter.Color)
+
+            /// The system will choose a random color for each particle between the given two Colors.
+            case random(a: ParticleEmitterComponent.ParticleEmitter.Color, b: ParticleEmitterComponent.ParticleEmitter.Color)
+
+            /// Returns a Boolean value indicating whether two values are equal.
+            ///
+            /// Equality is the inverse of inequality. For any values `a` and `b`,
+            /// `a == b` implies that `a != b` is `false`.
+            ///
+            /// - Parameters:
+            ///   - lhs: A value to compare.
+            ///   - rhs: Another value to compare.
+            public static func == (a: ParticleEmitterComponent.ParticleEmitter.ParticleColor.ColorValue, b: ParticleEmitterComponent.ParticleEmitter.ParticleColor.ColorValue) -> Bool
+        }
+
+        /// The particle will remain the given color throughout its lifetime.
+        case constant(ParticleEmitterComponent.ParticleEmitter.ParticleColor.ColorValue)
+
+        /// The particle's color will start at the `start` color and transition over its lifetime to the `end` color.
+        case evolving(start: ParticleEmitterComponent.ParticleEmitter.ParticleColor.ColorValue, end: ParticleEmitterComponent.ParticleEmitter.ParticleColor.ColorValue)
+
+        /// Returns a Boolean value indicating whether two values are equal.
+        ///
+        /// Equality is the inverse of inequality. For any values `a` and `b`,
+        /// `a == b` implies that `a != b` is `false`.
+        ///
+        /// - Parameters:
+        ///   - lhs: A value to compare.
+        ///   - rhs: Another value to compare.
+        public static func == (a: ParticleEmitterComponent.ParticleEmitter.ParticleColor, b: ParticleEmitterComponent.ParticleEmitter.ParticleColor) -> Bool
+    }
+
+    /// The color of particles.
+    public var color: ParticleEmitterComponent.ParticleEmitter.ParticleColor
+}
+
+@available(visionOS 1.0, macOS 15.0, iOS 18.0, *)
+extension ParticleEmitterComponent {
+
+    /// Options for specifying the duration of the particle effects, used by the timing property.
+    public enum Timing : Equatable, Codable {
+
+        /// Emits for the given `emit` duration and then stops, `warmUp` determines how long the simulation should appear to have run before first appearing.
+        case once(warmUp: TimeInterval? = nil, emit: ParticleEmitterComponent.Timing.VariableDuration)
+
+        /// Emits for the given `emit` duration, and waits `idle` seconds before looping, `warmUp` determines how long the simulation should appear to have run before first appearing.
+        case repeating(warmUp: TimeInterval? = nil, emit: ParticleEmitterComponent.Timing.VariableDuration, idle: ParticleEmitterComponent.Timing.VariableDuration? = nil)
+
+        /// Duration along with an optional variation used to define an amount of time.
+        public struct VariableDuration : Equatable, Codable {
+
+            /// Base duration of time.
+            public let duration: TimeInterval
+
+            /// Defines a plus/minus range from which a value is randomly selected and used to offset duration.
+            public let variation: TimeInterval?
+
+            public init(duration: TimeInterval, variation: TimeInterval? = nil)
+
+            /// Returns a Boolean value indicating whether two values are equal.
+            ///
+            /// Equality is the inverse of inequality. For any values `a` and `b`,
+            /// `a == b` implies that `a != b` is `false`.
+            ///
+            /// - Parameters:
+            ///   - lhs: A value to compare.
+            ///   - rhs: Another value to compare.
+            public static func == (lhs: ParticleEmitterComponent.Timing.VariableDuration, rhs: ParticleEmitterComponent.Timing.VariableDuration) -> Bool
+
+            /// Encodes this value into the given encoder.
+            ///
+            /// If the value fails to encode anything, `encoder` will encode an empty
+            /// keyed container in its place.
+            ///
+            /// This function throws an error if any values are invalid for the given
+            /// encoder's format.
+            ///
+            /// - Parameter encoder: The encoder to write data to.
+            public func encode(to encoder: any Encoder) throws
+
+            /// Creates a new instance by decoding from the given decoder.
+            ///
+            /// This initializer throws an error if reading from the decoder fails, or
+            /// if the data read is corrupted or otherwise invalid.
+            ///
+            /// - Parameter decoder: The decoder to read data from.
+            public init(from decoder: any Decoder) throws
+        }
+
+        /// Returns a Boolean value indicating whether two values are equal.
+        ///
+        /// Equality is the inverse of inequality. For any values `a` and `b`,
+        /// `a == b` implies that `a != b` is `false`.
+        ///
+        /// - Parameters:
+        ///   - lhs: A value to compare.
+        ///   - rhs: Another value to compare.
+        public static func == (lhs: ParticleEmitterComponent.Timing, rhs: ParticleEmitterComponent.Timing) -> Bool
+
+        /// Encodes this value into the given encoder.
+        ///
+        /// If the value fails to encode anything, `encoder` will encode an empty
+        /// keyed container in its place.
+        ///
+        /// This function throws an error if any values are invalid for the given
+        /// encoder's format.
+        ///
+        /// - Parameter encoder: The encoder to write data to.
+        public func encode(to encoder: any Encoder) throws
+
+        /// Creates a new instance by decoding from the given decoder.
+        ///
+        /// This initializer throws an error if reading from the decoder fails, or
+        /// if the data read is corrupted or otherwise invalid.
+        ///
+        /// - Parameter decoder: The decoder to read data from.
+        public init(from decoder: any Decoder) throws
+    }
+
+    /// Defines the Emitter timing method.
+    public var timing: ParticleEmitterComponent.Timing
+}
+
+@available(visionOS 1.0, macOS 15.0, iOS 18.0, *)
+extension ParticleEmitterComponent {
+
+    /// Initial configurations that can be set when starting a new simulation.
+    public struct Presets {
+    }
+}
+
+@available(visionOS 1.0, macOS 15.0, iOS 18.0, *)
+extension ShapeResource {
+
+    /// Creates a mesh-based collision shape derived from an ARKit scene-understanding mesh anchor.
+    ///
+    /// The returned `ShapeResource` can only be used under the following circumstances:
+    /// - This shape can only be used with `PhysicsBodyMode.static` (not `.dynamic` or `.kinematic`)
+    /// - This shape cannot be used with `CollisionComponent.Mode.trigger`
+    ///
+    /// In other words, the returned shape can only be used for static world geometry.
+    ///
+    /// - Note: Generating a shape resource from the AR mesh takes time,
+    ///         because the input mesh needs to be preprocessed
+    ///         ("cooked") by the physics engine before it can be used.  This function is marked `async` because ideally
+    ///         this precomputation should occur in the background.  For example, when calling from non-`async` code,
+    ///         you can use Swift's `Task` API to assign a priority (see the example below).
+    ///
+    /// Below is example usage of this function, assumed to be called from a non-async block:
+    /// ```swift
+    /// let myAnchor: MeshAnchor = ...
+    /// // It is recommended to use a low-priority task, since generating the collision mesh can take a while.
+    /// let myShapeTask = Task(priority: .low) {
+    ///     let shape = await ShapeResource.generateStaticMesh(from: myAnchor)
+    ///
+    ///     // Now we can do something with `shape`, such as create an entity with it.
+    ///     // Make sure to call non-async RealityKit methods from the main actor:
+    ///     await MainActor.run {
+    ///         let entity = Entity()
+    ///         entity.components[CollisionComponent.self] = .init(shapes: [shape])
+    ///
+    ///         // Note that `mode` can not be set to `.dynamic`.  Only `.static` is supported.
+    ///         entity.components[PhysicsBodyComponent.self] = .init(massProperties: .default,
+    ///                                                              material: nil,
+    ///                                                              mode: .static)
+    ///         // ...
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - meshAnchor: The mesh anchor that defines the collision shape.
+    ///     This anchor needs to have
+    ///     `meshAnchor.geometry.faces.primitive == GeometryElement.Primitive.triangle`.
+    nonisolated public static func generateStaticMesh(from meshAnchor: MeshAnchor) async throws -> ShapeResource
+}
+
+extension MeshResource {
+
+    /// Creates a MeshResource from the provided MeshAnchor.
+    ///
+    /// - Parameters:
+    ///     - meshAnchor: A MeshAnchor that will be used to generate the MeshResource.
+    @available(visionOS 2.0, *)
+    @available(macOS, unavailable)
+    @available(iOS, unavailable)
+    @available(tvOS, unavailable)
+    @MainActor @preconcurrency public convenience init(from meshAnchor: MeshAnchor) async throws
+
+    @available(visionOS 2.0, *)
+    @available(macOS, unavailable)
+    @available(iOS, unavailable)
+    @available(tvOS, unavailable)
+    @MainActor @preconcurrency public convenience init(from planeAnchor: PlaneAnchor) async throws
+}
+
+@available(macOS 10.15, iOS 13.0, visionOS 2.0, *)
+extension PointLightComponent {
+
+    /// A platform-specific type used to define color for a point light.
+    public typealias Color = UIColor
+
+    /// A color for the point light.
+    public var color: PointLightComponent.Color
+
+    /// Creates a point light component with a configuration.
+    ///
+    /// - Parameters:
+    ///   - color: The color of the light.
+    ///
+    ///   - intensity: The intensity of the light in lumens.
+    ///
+    ///   - attenuationRadius: The distance from the light source where its intensity reaches zero.
+    ///     Any objects at or beyond this distance do not receive illumination.
+    public init(color: PointLightComponent.Color = .white, intensity: Float = 26963.76, attenuationRadius: Float = 10.0)
+}
+
+@available(visionOS 2.0, iOS 18.0, macOS 15.0, *)
+extension PointLightComponent {
+
+    /// Creates a point light component with a configuration.
+    ///
+    /// - Parameters:
+    ///   - color: The color of the light.
+    ///   - intensity: The intensity of the light in lumens.
+    ///   - attenuationRadius: The distance from the light source where its intensity reaches zero.
+    ///     Any objects at or beyond this distance do not receive illumination.   
+    ///   - attenuationFalloffExponent: An exponent value for the light's intensity falloff-transition curve.
+    public init(color: PointLightComponent.Color = .white, intensity: Float = 26963.76, attenuationRadius: Float = 10.0, attenuationFalloffExponent: Float = 2.0)
+}
+
+@available(visionOS 2.0, macOS 10.15, iOS 13.0, *)
+extension SpotLightComponent {
+
+    /// A platform-specific type used to define color for a spotlight.
+    public typealias Color = UIColor
+
+    /// A color for the spotlight.
+    public var color: SpotLightComponent.Color
+
+    /// Creates a spotlight with the given parameters.
+    ///
+    /// - Parameters:
+    ///   - color: The color of the light.
+    ///   - intensity: The light's brightness.
+    ///   - innerAngleInDegrees: The angle of the cone that emits light at full intensity, in degrees.
+    ///   - outerAngleInDegrees: The angle of the cone beyond which the spotlight's intensity is zero.
+    ///   - attenuationRadius: The distance from the light source where its intensity reaches zero.
+    ///     Any objects at or beyond this distance do not receive illumination.
+    public init(color: SpotLightComponent.Color = .white, intensity: Float = 6740.94, innerAngleInDegrees: Float = 45.0, outerAngleInDegrees: Float = 60.0, attenuationRadius: Float = 10.0)
+}
+
+@available(visionOS 2.0, iOS 18.0, macOS 15.0, *)
+extension SpotLightComponent {
+
+    /// Creates a spotlight with the given parameters.
+    ///
+    /// - Parameters:
+    ///   - color: The color of the light.
+    ///   - intensity: The light's brightness.
+    ///   - innerAngleInDegrees: The angle of the cone that emits light at full intensity, in degrees.
+    ///   - outerAngleInDegrees: The angle of the cone beyond which the spotlight's intensity is zero.
+    ///   - attenuationRadius: The distance from the light source where its intensity reaches zero.
+    ///     Any objects at or beyond this distance do not receive illumination.
+    ///   - attenuationFalloffExponent: An exponent value for the light's intensity falloff-transition curve.
+    public init(color: SpotLightComponent.Color = .white, intensity: Float = 6740.94, innerAngleInDegrees: Float = 45.0, outerAngleInDegrees: Float = 60.0, attenuationRadius: Float = 10.0, attenuationFalloffExponent: Float = 2.0)
+}
+
+@available(macOS 14.0, iOS 17.0, *)
+extension AccessibilityComponent {
+
+    /// A context-sensitive event that helps VoiceOver users find the next instance of a related element.
+    @available(iOS 17.0, *)
+    @available(macOS, unavailable)
+    public enum RotorType : Equatable {
+
+        /// A rotor type provided by the system.
+        case system(UIAccessibilityCustomRotor.SystemRotorType)
+
+        case custom(LocalizedStringResource)
+
+        /// Returns a Boolean value indicating whether two values are equal.
+        ///
+        /// Equality is the inverse of inequality. For any values `a` and `b`,
+        /// `a == b` implies that `a != b` is `false`.
+        ///
+        /// - Parameters:
+        ///   - lhs: A value to compare.
+        ///   - rhs: Another value to compare.
+        public static func == (a: AccessibilityComponent.RotorType, b: AccessibilityComponent.RotorType) -> Bool
+    }
+
+    /// The combination of accessibility traits that best characterize the entity.
+    @available(iOS 17.0, *)
+    @available(macOS, unavailable)
+    public var traits: UIAccessibilityTraits
+
+    /// An array of supported rotors.
+    @available(iOS 17.0, *)
+    @available(macOS, unavailable)
+    public var customRotors: [AccessibilityComponent.RotorType]
+}
+
+@available(macOS 14.0, iOS 17.0, *)
+extension Entity {
+
+    /// A succinct label that identifies the entity, in a localized string key.
+    @MainActor @preconcurrency public var accessibilityLabelKey: LocalizedStringResource?
+
+    /// A localized string key that represents the current value of the entity.
+    @MainActor @preconcurrency public var accessibilityValue: LocalizedStringResource?
+
+    /// The combination of accessibility traits that best characterize the entity.
+    @available(iOS 17.0, *)
+    @available(macOS, unavailable)
+    @MainActor @preconcurrency public var accessibilityTraits: UIAccessibilityTraits
+
+    /// The Custom Content API is useful for delivering accessibility information from complex data sets to your users in measured portions.
+    /// Using this API allows you to leverage assistive technologies to present only the accessible content your app’s users need, when they need it.
+    @MainActor @preconcurrency public var accessibilityCustomContent: [AccessibilityComponent.CustomContent]
+
+    /// An array of supported rotors.
+    @available(iOS 17.0, *)
+    @available(macOS, unavailable)
+    @MainActor @preconcurrency public var accessibilityCustomRotors: [AccessibilityComponent.RotorType]
+
+    /// The set of supported accessibility actions.
+    @MainActor @preconcurrency public var accessibilitySystemActions: AccessibilityComponent.SupportedActions
+
+    /// An array of custom actions supported by the entity, identified by their localized string key.
+    @MainActor @preconcurrency public var accessibilityCustomActions: [LocalizedStringResource]
+}
+
+@available(iOS 18.0, macOS 15.0, visionOS 2.0, *)
+extension HoverEffectComponent.SpotlightHoverEffectStyle {
+
+    /// The color tint for the spotlight hover effect.
+    public var color: UIColor
+
+    /// Creates a new spotlight effect with a color and strength.
+    public init(color: UIColor? = nil, strength: Float = 1.0, opacityFunction: HoverEffectComponent.OpacityFunction)
+
+    /// Creates a new spotlight effect with a color and strength.
+    public init(color: UIColor? = nil, strength: Float = 1.0)
+}
+
+@available(iOS 18.0, macOS 15.0, visionOS 2.0, *)
+extension HoverEffectComponent.HighlightHoverEffectStyle {
+
+    /// The color tint for the highlight hover effect.
+    public var color: UIColor
+
+    /// Creates a new highlight effect with a color and strength.
+    public init(color: UIColor? = nil, strength: Float = 1.0, opacityFunction: HoverEffectComponent.OpacityFunction)
+
+    /// Creates a new highlight effect with a color and strength.
+    public init(color: UIColor? = nil, strength: Float = 1.0)
+}
+
+@available(macOS 10.15, iOS 13.0, visionOS 2.0, *)
+extension DirectionalLightComponent {
+
+    /// A platform-specific type used to define color for a directional light.
+    public typealias Color = UIColor
+
+    /// A color for the directional light.
+    public var color: DirectionalLightComponent.Color
+
+    /// Creates a directional light with a configuration.
+    ///
+    /// - Parameters:
+    ///   - color: A color for the light.
+    ///
+    ///   - intensity: The intensity of the light, measured in lumen per square
+    ///       meter.
+    @available(visionOS 2.0, *)
+    @available(iOS, unavailable)
+    @available(macOS, unavailable)
+    @available(macCatalyst, unavailable)
+    public init(color: DirectionalLightComponent.Color = .white, intensity: Float = 2145.7078)
+}
+
+@available(macOS 10.15, iOS 13.0, *)
+extension TextureResource {
+
+    /// Returns a texture resource by synchronously loading it from a bundle.
+    ///
+    /// Loading a ``TextureResource`` with this method blocks the main actor because it’s synchronous, so only call it from a command line application.
+    /// The method can stall a regular app which makes it visibly hitch, and the system terminates an app if its UI becomes unresponsive.
+    /// See ``init(named:in:)`` for an example that demonstrates how to safely load content.
+    ///
+    /// This method loads the image specified by the `URL` and creates a texture
+    /// resource from it. The method blocks until it has loaded the image and
+    /// created the texture resource. RealityKit automatically creates a
+    /// resource name for this texture resource based on the `name` and `bundle`
+    /// value.
+    ///
+    /// RealityKit uses the resource name to identify texture resources, and
+    /// also to match texture resources between networked peers. Specify a
+    /// unique resource name for each texture resource you load or generate.
+    ///
+    /// - Parameters:
+    ///   - name: The name of the resource. The file extension is optional.
+    ///
+    ///   - bundle: The bundle to search for the resource. Use `nil` to indicate
+    ///     the app’s bundle.
+    ///
+    /// - Returns: The loaded resource.
+    @available(*, noasync, message: "Synchronous loading APIs block the main actor and should not be used in async contexts.  Use init(...) async instead")
+    @MainActor @preconcurrency public static func load(named name: String, in bundle: Bundle? = nil) throws -> TextureResource
+
+    /// Returns a load request that creates a texture resource by asynchronously loading it from a bundle.
+    ///
+    /// RealityKit automatically creates a resource name for the texture
+    /// resource based on the value of `name` and `bundle`. RealityKit uses the
+    /// resource name to identify resources, and to match texture resources
+    /// between networked peers. Specify a unique name for each texture resource
+    /// you load or generate.
+    ///
+    /// See ``init(named:in:)`` for an example of optimally loading textures with
+    /// other content.
+    ///
+    /// - Parameters:
+    ///   - name: The name of the resource. The file extension is optional.
+    ///
+    ///   - bundle: The bundle to search for the resource. Use `nil` to indicate
+    ///     the app’s bundle.
+    ///
+    /// - Returns: A load operation that publishes the resource.
+    @available(macOS, introduced: 10.15, deprecated: 15.0, renamed: "init(named:in:)")
+    @available(iOS, introduced: 13.0, deprecated: 18.0, renamed: "init(named:in:)")
+    @available(macCatalyst, introduced: 13.0, deprecated: 18.0, renamed: "init(named:in:)")
+    @available(visionOS, introduced: 1.0, deprecated: 1.0, renamed: "init(named:in:)")
+    @MainActor @preconcurrency public static func loadAsync(named name: String, in bundle: Bundle? = nil) -> LoadRequest<TextureResource>
+}
+
+@available(macOS 12.0, iOS 15.0, *)
+extension TextureResource {
+
+    /// Returns a texture resource by synchronously loading it from a bundle with options.
+    ///
+    /// Loading a ``TextureResource`` with this method blocks the main actor because it’s synchronous, so only call it from a command line application.
+    /// The method can stall a regular app which makes it visibly hitch, and the system terminates an app if its UI becomes unresponsive.
+    /// See ``init(named:in:)`` for an example that demonstrates how to safely load content.
+    ///
+    /// This method loads the image specified by the `URL` and creates a texture
+    /// resource from it. This method blocks until it has loaded the image and
+    /// created the texture resource. RealityKit automatically creates a
+    /// resource name for this texture resource based on the `name` and `bundle`
+    /// value.
+    ///
+    /// RealityKit uses the resource name to identify resources, and to match
+    /// texture resources between networked peers. Specify a unique name for
+    /// each texture resource you load or generate.
+    ///
+    /// - Parameters:
+    ///   - name: The name of the resource. The file extension is optional.
+    ///
+    ///   - bundle: The bundle to search for the resource. Use `nil` to indicate the app’s bundle.
+    ///
+    ///   - options: Configurable options that affect texture loading.
+    ///
+    /// - Returns: The loaded resource.
+    @available(*, noasync, message: "Synchronous loading APIs block the main actor and should not be used in async contexts.  Use init(...) async instead")
+    @MainActor @preconcurrency public static func load(named name: String, in bundle: Bundle? = nil, options: TextureResource.CreateOptions) throws -> TextureResource
+
+    /// Returns a load request that creates a texture resource by asynchronously loading it from a bundle with options.
+    ///
+    /// RealityKit automatically creates a resource name for the texture
+    /// resource based on the value of `name` and `bundle`. RealityKit uses the
+    /// resource name to identify resources, and to match texture resources
+    /// between networked peers. Specify a unique name for each texture resource
+    /// you load or generate.
+    ///
+    /// See ``init(named:in:)`` for an example of optimally loading textures with
+    /// other content.
+    ///
+    /// - Parameters:
+    ///   - name: The name of the resource. The file extension is optional.
+    ///
+    ///   - bundle: The bundle to search for the resource. Use `nil` to indicate the app’s bundle.
+    ///
+    ///   - options: Configuration options for texture creation.
+    ///
+    /// - Returns: A load operation that publishes the resource.
+    @available(macOS, introduced: 12.0, deprecated: 15.0, renamed: "init(named:in:options:)")
+    @available(iOS, introduced: 15.0, deprecated: 18.0, renamed: "init(named:in:options:)")
+    @available(macCatalyst, introduced: 15.0, deprecated: 18.0, renamed: "init(named:in:options:)")
+    @available(visionOS, introduced: 1.0, deprecated: 1.0, renamed: "init(named:in:options:)")
+    @MainActor @preconcurrency public static func loadAsync(named name: String, in bundle: Bundle? = nil, options: TextureResource.CreateOptions) -> LoadRequest<TextureResource>
+}
+
+@available(visionOS 1.0, macOS 15.0, iOS 18.0, *)
+extension TextureResource {
+
+    /// Asynchronously loads a texture resource from a bundle.
+    ///
+    /// RealityKit automatically creates a resource name for the texture
+    /// resource based on the value of `name` and `bundle`. RealityKit uses the
+    /// resource name to identify resources, and to match texture resources
+    /// between networked peers. Specify a unique name for each texture resource
+    /// you load or generate.
+    ///
+    /// Load textures concurrently with other content for optimal load times without
+    /// causing your app to hitch.
+    ///
+    /// ```swift
+    /// struct SomeRealityView: View {
+    ///     var body: some View {
+    ///         RealityView { content in
+    ///             // Begin loading the texture.
+    ///             async let textureA = try? TextureResource(named:"textureA.jpg")
+    ///             // Load the scene.
+    ///             guard let rootEntity = try? await Entity(named: "SceneA", in: realityKitContentBundle) else {
+    ///                 return
+    ///             }
+    ///             // Wait for the texture to complete loading.
+    ///             guard let textureA = await textureA else {
+    ///                 return
+    ///             }
+    ///
+    ///             // Create and assign a material using the texture to a model entity.
+    ///             if let entityA = rootEntity.findEntity(named: "ModelA") as? ModelEntity {
+    ///                 var material = PhysicallyBasedMaterial()
+    ///                 material.baseColor = PhysicallyBasedMaterial.BaseColor(tint: .white,
+    ///                                                                        texture: .init(textureA))
+    ///                 entityA.model?.materials[0] = material
+    ///             }
+    ///
+    ///             content.add(rootEntity)
+    ///         }
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - name: The name of the resource. The file extension is optional.
+    ///
+    ///   - bundle: The bundle to search for the resource. Use `nil` to indicate
+    ///     the app’s bundle.
+    @MainActor @preconcurrency public convenience init(named name: String, in bundle: Bundle? = nil) async throws
+
+    /// Asynchronously loads a texture resource from a bundle with options.
+    ///
+    /// RealityKit automatically creates a resource name for the texture
+    /// resource based on the value of `name` and `bundle`. RealityKit uses the
+    /// resource name to identify resources, and to match texture resources
+    /// between networked peers. Specify a unique name for each texture resource
+    /// you load or generate.
+    ///
+    /// See ``init(named:in:)`` for an example of optimally loading textures with
+    /// other content.
+    ///
+    /// - Parameters:
+    ///   - name: The name of the resource. The file extension is optional.
+    ///
+    ///   - bundle: The bundle to search for the resource. Use `nil` to indicate the app’s bundle.
+    ///
+    ///   - options: Configuration options for texture creation.
+    @MainActor @preconcurrency public convenience init(named name: String, in bundle: Bundle? = nil, options: TextureResource.CreateOptions) async throws
+}
+
+@available(macOS 10.15, iOS 13.0, *)
+extension MCPeerID : SynchronizationPeerID {
+}
+
+@available(macOS 10.15, iOS 13.0, *)
+extension Material {
+
+    /// An alias for the color type that’s appropriate for the current platform.
+    public typealias Color = UIColor
+}
+
+@available(macOS 10.15, iOS 13.0, *)
+extension SimpleMaterial {
+
+    /// A tint color applied to the base color in macOS.
+    @available(macOS, deprecated: 12.0, renamed: "color")
+    @available(iOS, deprecated: 15.0, renamed: "color")
+    @available(macCatalyst, deprecated: 15.0, renamed: "color")
+    @available(visionOS, deprecated: 1.0, renamed: "color")
+    public var tintColor: UIColor
+
+    /// The base color of the material.
+    @available(macOS, deprecated: 12.0, renamed: "color")
+    @available(iOS, deprecated: 15.0, renamed: "color")
+    @available(macCatalyst, deprecated: 15.0, renamed: "color")
+    @available(visionOS, deprecated: 1.0, renamed: "color")
+    public var baseColor: MaterialColorParameter
+
+    /// Creates a simple material with specific characteristics in macOS.
+    ///
+    /// - Parameters:
+    ///   - color: The color of the material.
+    ///
+    ///   - roughness: The roughness of the material.
+    ///
+    ///   - isMetallic: A Boolean indicating whether the material should have a
+    ///     metallic appearance.
+    public init(color: SimpleMaterial.Color, roughness: MaterialScalarParameter = 0.0, isMetallic: Bool)
+}
+
+@available(macOS 10.15, iOS 13.0, *)
+extension UnlitMaterial {
+
+    /// A tint color applied to the base color.
+    @available(macOS, deprecated: 12.0, renamed: "color")
+    @available(iOS, deprecated: 15.0, renamed: "color")
+    @available(macCatalyst, deprecated: 15.0, renamed: "color")
+    @available(visionOS, deprecated: 1.0, renamed: "color")
+    public var tintColor: UIColor
+
+    /// The base color of the material.
+    @available(macOS, deprecated: 12.0, renamed: "color")
+    @available(iOS, deprecated: 15.0, renamed: "color")
+    @available(macCatalyst, deprecated: 15.0, renamed: "color")
+    @available(visionOS, deprecated: 1.0, renamed: "color")
+    public var baseColor: MaterialColorParameter
+
+    /// Creates an unlit material with the given base color.
+    ///
+    /// - Parameters:
+    ///   - color: The base color for the new material.
+    ///
+    /// - Note: The blending mode of `UnlitMaterial` materials should be configured explicitly with the
+    /// ``UnlitMaterial/blending-swift.property`` property for transparent or translucent surfaces.  The
+    /// `opaque` mode is used when unset.
+    public init(color: UIColor)
+}
+
+@available(visionOS 1.0, macOS 15.0, iOS 18.0, *)
+extension UnlitMaterial {
+
+    public init(color: UIColor, applyPostProcessToneMap: Bool)
+}
+
+@available(visionOS 1.0, macOS 15.0, iOS 18.0, *)
+extension MaterialParameters.Value {
+
+    public var colorValue: UIColor? { get }
+
+    public static func color(_ color: UIColor) -> MaterialParameters.Value
+}
+
+@available(macOS 12.0, iOS 15.0, *)
+extension PhysicallyBasedMaterial.BaseColor {
+
+    /// Creates a base color object from a color or texture on macOS.
+    ///
+    /// This initializer creates a new instance from a color or image texture,
+    /// or from both. If you don’t provide a `tint` color, `tint` defaults to
+    /// white.
+    ///
+    /// If you specify `texture`, RealityKit calculates the final base color for
+    /// the entity by UV-mapping `texture` onto the entity and then multiplying
+    /// the color at any given pixel by `tint`. If `tint` is white, RealityKit
+    /// renders the textured untinted.
+    ///
+    /// If you don’t specify a texture, RealityKit uses `tint` as the entity’s
+    /// base color.
+    ///
+    /// - Parameters:
+    ///   - tint: The tint color. Defaults to white.
+    ///
+    ///   - texture: An optional image texture.
+    public init(tint: UIColor = .white, texture: MaterialParameters.Texture? = nil)
+
+    public var tint: UIColor
+}
+
+@available(macOS 12.0, iOS 15.0, *)
+extension PhysicallyBasedMaterial.EmissiveColor {
+
+    /// Creates a color of emitted light in iOS.
+    ///
+    /// This initializer creates an object from a color, an image texture, or
+    /// from both. The `color` property defaults to black, which results in no
+    /// light emissions. With custom materials, `color` and `texture` are
+    /// available as inputs in your surface shader, but your surface shader must
+    /// call `params.surface().set_emissive_color()`, otherwise RealityKit
+    /// renders no light emission.
+    ///
+    /// The following Metal code demonstrates how to replicate the emissive
+    /// behavior of ``PhysicallyBasedMaterial`` in your surface shader code:
+    ///
+    /// ```swift
+    ///     // Retrieve the emissive color tint from the CustomMaterial.
+    ///     half3 emissiveColorTint = (half3)params.material_constants()
+    ///                               .emissive_color_tint();
+    ///
+    ///     // Retrieve the primary texture coordinates.
+    ///     float2 uv = params.geometry().uv0();
+    ///
+    ///     // Flip the UV coordinate’s y-axis. You only need to do this
+    ///     // for models you load from USDZ or .reality files.
+    ///     uv.y = 1.0 - uv.y;
+    ///
+    ///     auto tex = params.textures();
+    ///     half3 color = (half3)tex.emissive_color()
+    ///                   .sample(textureSampler, uv).rgb;
+    ///
+    ///     // Multiply the tint and the sampled value from the texture,
+    ///     // and assign the result to the shader's emissive color
+    ///     // property.
+    ///     color *= emissiveColorTint;
+    ///     params.surface().set_emissive_color(color);
+    /// ```
+    ///
+    /// - Note: Unlike ``PhysicallyBasedMaterial``, ``CustomMaterial`` has no
+    /// ``PhysicallyBasedMaterial/emissiveIntensity`` value. If you need to pass
+    /// an emissive intensity value to your surface shader, use the
+    /// ``CustomMaterial/custom-swift.property`` property or another unused
+    /// attribute property.
+    ///
+    /// - Parameters:
+    ///   - color: The color of the emitted light. Defaults to black.
+    ///
+    ///   - texture: An optional UV-mapped image texture.
+    public init(color: UIColor = .black, texture: MaterialParameters.Texture? = nil)
+
+    public var color: UIColor
+}
+
+@available(macOS 12.0, iOS 15.0, *)
+extension PhysicallyBasedMaterial.SheenColor {
+
+    /// Creates a sheen color in macOS.
+    ///
+    /// This initializer creates an object from a color, an image texture, or
+    /// from both. If you don’t provide a `tint` color, `tint` defaults to
+    /// white.
+    ///
+    /// If you specify `texture`, RealityKit calculates the final sheen color
+    /// for the entity by UV-mapping `texture` onto the entity and then
+    /// multiplying the color at any given pixel by `tint`. If `tint` is white,
+    /// RealityKit uses the texture untinted.
+    ///
+    /// If you don’t specify `texture`, then RealityKit uses `tint` as the
+    /// entity’s sheen color.
+    ///
+    /// - Parameters:
+    ///   - tint: The tint color.
+    ///
+    ///   - texture: The optional image texture.
+    public init(tint: UIColor = .white, texture: MaterialParameters.Texture? = nil)
+
+    public var tint: UIColor
+}
+
+
+// MARK: - SwiftUI Additions
+
+import Observation
+import SwiftUI
+import os
+
+// Available when SwiftUI is imported with RealityKit
+/// A type-erased attachment content.
+///
+/// An `AnyAttachmentContent` allows changing the type of attachment used in a
+/// given attachment content. Whenever the type of attachment content used with
+/// an `AnyAttachmentContent` changes, the old content is destroyed and the new
+/// content is created for the new type.
+@available(visionOS 2.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@MainActor @frozen @preconcurrency public struct AnyAttachmentContent : AttachmentContent {
+
+    /// Creates an instance that type-erases ``AttachmentContent``.
+    @MainActor @preconcurrency public init<Content>(_ content: Content) where Content : AttachmentContent
+
+    @available(visionOS 2.0, *)
+    @available(iOS, unavailable)
+    @available(macOS, unavailable)
+    @available(macCatalyst, unavailable)
+    public typealias Body = Never
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 2.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+extension AnyAttachmentContent : Sendable {
+}
+
+// Available when SwiftUI is imported with RealityKit
+/// An attachment content you can use to gather an identifier and view.
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+@MainActor @preconcurrency public struct Attachment<Content> where Content : View {
+
+    /// The identifier of this attachment.
+    @MainActor @preconcurrency public var id: AnyHashable
+
+    /// The view associated with this attachment.
+    @MainActor @preconcurrency public var content: Content
+
+    /// Creates an new attachment from an identifier and a closure.
+    ///
+    /// - Parameters:
+    ///   - id:  An `AnyHashable` instance that identifies the attachment and
+    ///   a ``ViewAttachmentEntity``.
+    ///   
+    ///   - content: A `ViewBuilder` instance that contains the views for the
+    ///   attachment.
+    ///
+    /// You can access details of an attachment entity, such as its bounds,
+    /// by calling the methods of a ``ViewAttachmentEntity`` instance.
+    /// For example, you can add an attachment that contains the text `"hello"`.
+    /// ```swift
+    /// Attachment(id: "example") {
+    ///     Text("hello")
+    /// }
+    /// ```
+    /// - Note: The initializer doesn't automatically add the views to a
+    /// ``RealityView`` instance.
+    ///   You need to explicitly add each entity to your app's scene hierarchy
+    ///   by directly placing an entity attachment to the view or as a child of
+    ///   another entity that's already in the view.
+    nonisolated public init(id: AnyHashable, @ViewBuilder _ content: @escaping () -> Content)
+
+    @available(visionOS 1.0, *)
+    @available(iOS, unavailable)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    @available(macOS, unavailable)
+    @available(macCatalyst, unavailable)
+    public typealias Body = Never
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension Attachment : AttachmentContent {
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension Attachment : Sendable {
+}
+
+// Available when SwiftUI is imported with RealityKit
+/// A type that provides content for an attachment content builder.
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@MainActor @preconcurrency public protocol AttachmentContent {
+
+    associatedtype Body : AttachmentContent
+
+    @AttachmentContentBuilder @MainActor @preconcurrency var body: Self.Body { get }
+}
+
+// Available when SwiftUI is imported with RealityKit
+/// A result builder that creates attachment content from closures.
+///
+/// The `buildBlock` methods in this type create ``AttachmentContent``
+/// instances based on the number and types of sources provided as parameters.
+///
+/// RealityKit calls this builder for you when SwiftUI annotates the `attachment`
+/// parameter of some ``RealityView`` initializers that have the
+/// `@AttachmentContentBuilder` annotation.
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+@resultBuilder public struct AttachmentContentBuilder {
+
+    /// Builds an expression within the builder.
+    public static func buildExpression<Content>(_ content: Content) -> Content where Content : AttachmentContent
+
+    /// Creates an empty attachment content containing no statements.
+    public static func buildBlock() -> EmptyAttachmentContent
+
+    /// Creates a single content result.
+    public static func buildBlock<C>(_ content: C) -> C where C : AttachmentContent
+
+    /// Provides support for “if” statements in multi-statement closures,
+    /// producing an optional view that is visible only when the condition
+    /// evaluates to `true`.
+    public static func buildIf<Content>(_ content: Content?) -> Content? where Content : AttachmentContent
+
+    /// Provides support for "if" statements in multi-statement closures,
+    /// producing conditional content for the "then" branch.
+    public static func buildEither<TrueContent, FalseContent>(first: TrueContent) -> ConditionalAttachmentContent<TrueContent, FalseContent> where TrueContent : AttachmentContent, FalseContent : AttachmentContent
+
+    /// Provides support for "if-else" statements in multi-statement closures,
+    /// producing conditional content for the "else" branch.
+    public static func buildEither<TrueContent, FalseContent>(second: FalseContent) -> ConditionalAttachmentContent<TrueContent, FalseContent> where TrueContent : AttachmentContent, FalseContent : AttachmentContent
+
+    /// Provides support for "if" statements with `#available()` clauses in
+    /// multi-statement closures, producing conditional content for the "then"
+    /// branch, i.e. the conditionally-available branch.
+    @available(visionOS 2.0, *)
+    public static func buildLimitedAvailability(_ content: any AttachmentContent) -> some AttachmentContent
+
+
+    /// Provides support for lists of Attachments to be created in parallel.
+    public static func buildBlock<each Content>(_ content: repeat each Content) -> TupleAttachmentContent<(repeat each Content)> where repeat each Content : AttachmentContent
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+@frozen public struct ConditionalAttachmentContent<TrueContent, FalseContent> {
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension ConditionalAttachmentContent : AttachmentContent where TrueContent : AttachmentContent, FalseContent : AttachmentContent {
+
+    @available(visionOS 1.0, *)
+    @available(iOS, unavailable)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    @available(macOS, unavailable)
+    @available(macCatalyst, unavailable)
+    public typealias Body = Never
+}
+
+// Available when SwiftUI is imported with RealityKit
+/// A attachment content that doesn't contain any content.
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+@MainActor @preconcurrency public struct EmptyAttachmentContent : AttachmentContent {
+
+    /// Creates an empty attachment content.
+    @MainActor @preconcurrency public init()
+
+    @available(visionOS 1.0, *)
+    @available(iOS, unavailable)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    @available(macOS, unavailable)
+    @available(macCatalyst, unavailable)
+    public typealias Body = Never
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension EmptyAttachmentContent : Sendable {
+}
+
+// Available when SwiftUI is imported with RealityKit
+/// A value containing an original gesture value along with a targeted entity.
+///
+/// Spatial data from a <doc://com.apple.documentation/documentation/swiftui/draggesture/value/location> returned by a gesture can be converted to and from the entity
+/// using functions defined in ``RealityCoordinateSpaceConverting``.
+///
+///For example, here's how to convert <doc://com.apple.documentation/documentation/swiftui/draggesture/value/location> from a
+/// <doc://com.apple.documentation/documentation/swiftui/draggesture> to the parent of an ``Entity``:
+///
+/// ```swift
+/// DragGesture(coordinateSpace: .global).targetedToEntity().updating($state) { state, value, _ in
+///     let location = value.convert(
+///         value.location, from: .global, to: value.entity.parent
+///     )
+///     ...
+/// }
+/// ```
+@available(visionOS 1.0, macOS 15.0, iOS 18.0, *)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+@dynamicMemberLookup public struct EntityTargetValue<Value> {
+
+    /// The gesture value updated by the gesture.
+    public var gestureValue: Value
+
+    /// The targeted entity.
+    public var entity: Entity
+
+    public subscript<T>(dynamicMember keyPath: KeyPath<Value, T>) -> T { get }
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension EntityTargetValue : RealityCoordinateSpaceConverting {
+
+    public func transform(from: some RealityCoordinateSpace, to: some CoordinateSpaceProtocol) -> AffineTransform3D
+
+    public func transform(from: some CoordinateSpaceProtocol, to: some RealityCoordinateSpace) -> AffineTransform3D
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, macOS 15.0, iOS 18.0, *)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension EntityTargetValue : Equatable where Value : Equatable {
+
+    /// Returns a Boolean value indicating whether two values are equal.
+    ///
+    /// Equality is the inverse of inequality. For any values `a` and `b`,
+    /// `a == b` implies that `a != b` is `false`.
+    ///
+    /// - Parameters:
+    ///   - lhs: A value to compare.
+    ///   - rhs: Another value to compare.
+    public static func == (lhs: EntityTargetValue<Value>, rhs: EntityTargetValue<Value>) -> Bool
+}
+
+// Available when SwiftUI is imported with RealityKit
+/// A view that asynchronously loads and displays a 3D model.
+///
+///  Use `Model3D` to embed a 3D model from a USD file or Reality
+///  file in your SwiftUI app.
+///
+///  You can use methods on the ``ResolvedModel3D`` type as well as
+///  standard view modifiers to adjust the size of the model to fit your app's
+///  interface. Here, the ``ResolvedModel3D/resizable(_:)`` method scales the
+///  model to fit the current view.
+///  Then, the <doc://com.apple.documentation/documentation/SwiftUI/View/aspectratio(_:contentmode:)-771ow> view modifier adjusts
+///  this resizing behavior to maintain the model's original aspect ratio, rather
+///  than scaling the `x`,` y`-, and `z` axes independently to fit the robot to the
+///  full frame of the view.
+///
+/// ```swift
+///  Model3D(named: "Robot-Drummer") { model in
+///      model
+///          .resizable()
+///          .aspectRatio(contentMode: .fit)
+///  } placeholder: {
+///      ProgressView()
+///  }
+/// ```
+///
+///  If loading from a remote URL, this view uses the shared
+///  <doc://com.apple.documentation/documentation/Foundation/URLSession>
+///  instance to load a model from the specified URL, and then display it.
+///  For example, you can display a model that's stored on a server:
+///
+/// ```swift
+///  Model3D(url: URL(string: "https://example.com/robot.usdz")!)
+///      .frame(width: 300, height: 600)
+/// ```
+///
+///  Until the model loads, the view displays a standard placeholder that
+///  fills the available space. After the load completes successfully, the view
+///  updates to display the model. In the example above, the model is smaller
+///  than the frame, and so appears smaller than the placeholder.
+///
+///  ![A diagram that shows a grey box on the left, a robot drummer model on the
+///  right, and an arrow pointing from the first to the second. The model
+///  is about half the width of the grey box.](AsyncModel-1)
+///
+///  You can specify a custom placeholder using
+///  ``init(url:content:placeholder:)``. With this initializer, you can
+///  also use the `content` parameter to manipulate the loaded model.
+///  For example, you can add a modifier to make the loaded image resizable:
+///
+/// ```swift
+///  let url = URL(string: "https://example.com/robot.usdz")!
+///  Model3D(url: url) { model in
+///      model.resizable()
+///  } placeholder: {
+///      ProgressView()
+///  }
+///  .frame(width: 50, height: 50)
+/// ```
+///
+///  For this example, ``Model3D`` shows a  <doc://com.apple.documentation/documentation/swiftui/progressview> first, and then the
+///  model scaled to fit in the specified frame:
+///
+///  ![A diagram that shows a progress view on the left, a robot drummer model
+///  on the right, and an arrow pointing from the first to the
+///  second.](AsyncModel-2)
+///
+///  > Important: You can't apply ``ResolvedModel3D``-specific modifiers, like ``ResolvedModel3D/resizable(_:)``, directly to a `Model3D`. Instead, apply them to the
+///  `ResolvedModel3D` instance that your `content` closure gets when defining the view's appearance.
+///
+///  To gain more control over the loading process, use the
+///  ``init(url:transaction:content:)`` initializer, which takes a
+///  `content` closure that receives a ``Model3DPhase`` to indicate
+///  the state of the loading operation. Return a view that's appropriate
+///  for the current phase:
+///
+/// ```swift
+///  let url = URL(string: "https://example.com/robot.usdz")!
+///  Model3D(url: url) { phase in
+///      if let model = phase.model {
+///          model // Displays the loaded model.
+///      } else if phase.error != nil {
+///          Color.red // Indicates an error.
+///      } else {
+///          Color.blue // Acts as a placeholder.
+///      }
+///  }
+/// ```
+@available(visionOS 1.0, *)
+@available(iOS, unavailable)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+@MainActor @preconcurrency public struct Model3D<Content> : View where Content : View {
+
+    /// Loads and displays a model from the specified URL.
+    ///
+    /// Until the model loads, SwiftUI displays a default placeholder. When
+    /// the load operation completes successfully, SwiftUI updates the
+    /// view to show the loaded model. If the operation fails, SwiftUI
+    /// continues to display the placeholder. The following example loads
+    /// and displays a model from an example server:
+    ///
+    /// ```swift
+    /// Model3D(url: URL(string: "https://example.com/robot.usdz")!)
+    /// ```
+    ///
+    /// If you want to customize the placeholder or apply ``Model3D``-specific
+    /// modifiers --- like ``ResolvedModel3D/resizable()`` ---
+    /// to the loaded model, use the ``init(url:content:placeholder:)``
+    /// initializer instead.
+    ///
+    /// - Parameters:
+    ///   - url: The URL of the model to display.
+    nonisolated public init(url: URL) where Content == ResolvedModel3D
+
+    /// Loads and displays a modifiable model from the specified URL using
+    /// a custom placeholder until the model loads.
+    ///
+    /// Until the model loads, `Model3D` displays the placeholder view that
+    /// you specify. When the load operation completes successfully, `Model3D`
+    /// updates the view to show content that you specify, which you
+    /// create using the loaded model. For example, you can show a green
+    /// placeholder, followed by a scaled version of the loaded model:
+    ///
+    /// ```swift
+    /// let url = URL(string: "https://example.com/robot.usdz")!
+    /// Model3D(url: url) { model in
+    ///     model.resizable()
+    /// } placeholder: {
+    ///     Color.green
+    /// }
+    /// ```
+    ///
+    /// If the load operation fails, `Model3D` continues to display the
+    /// placeholder. To be able to display a different view on a load error,
+    /// use the ``init(url:transaction:content:)`` initializer instead.
+    ///
+    /// - Parameters:
+    ///   - url: The URL of the model to display.
+    ///   - content: A closure that takes the loaded model as an input, and
+    ///     returns the view to show. You can return the model directly, or
+    ///     modify it as needed before returning it.
+    ///   - placeholder: A closure that returns the view to show until the
+    ///     load operation completes successfully.
+    nonisolated public init<Model, Placeholder>(url: URL, @ViewBuilder content: @escaping (ResolvedModel3D) -> Model, @ViewBuilder placeholder: @escaping () -> Placeholder) where Content == Model3DPlaceholderContent<Model, Placeholder>, Model : View, Placeholder : View
+
+    /// Loads and displays a modifiable model from the specified URL in phases.
+    ///
+    /// If you set the asynchronous model's URL to `nil`, or after you set the
+    /// URL to a value but before the load operation completes, the phase is
+    /// ``Model3DPhase/empty``. After the operation completes, the phase
+    /// becomes either ``Model3DPhase/failure(_:)`` or
+    /// ``Model3DPhase/success(_:)``. In the first case, the phase's
+    /// ``Model3DPhase/error`` value indicates the reason for failure.
+    /// In the second case, the phase's ``Model3DPhase/model`` property
+    /// contains the loaded model. Use the phase to drive the output of the
+    /// `content` closure, which defines the view's appearance:
+    ///
+    /// ```swift
+    /// let url = URL(string: "https://example.com/robot.usdz")!
+    /// Model3D(url: url) { phase in
+    ///     if let model = phase.model {
+    ///         model // Displays the loaded model.
+    ///     } else if phase.error != nil {
+    ///         Color.red // Indicates an error.
+    ///     } else {
+    ///         Color.blue // Acts as a placeholder.
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// To add transitions when you change the URL, apply an identifier to the
+    /// ``Model3D``.
+    ///
+    /// - Parameters:
+    ///   - url: The URL of the image to display.
+    ///   - transaction: The transaction to use when the phase changes.
+    ///   - content: A closure that takes the load phase as an input, and
+    ///     returns the view to display for the specified phase.
+    nonisolated public init(url: URL, transaction: Transaction = Transaction(), @ViewBuilder content: @escaping (Model3DPhase) -> Content)
+
+    /// Loads and displays a model by name, by searching through the specified
+    /// ``Foundation/Bundle``.
+    ///
+    /// Until the model loads, `Model3D` displays a default placeholder. When
+    /// the load operation completes successfully, `Model3D` updates the
+    /// view to show the loaded model. If the operation fails, `Model3D`
+    /// continues to display the placeholder. The following example loads
+    /// and displays a model from an example server:
+    ///
+    /// ```swift
+    /// Model3D(named: "Robot-Drummer")
+    /// ```
+    ///
+    /// If you want to customize the placeholder or apply
+    /// ``ResolvedModel3D``-specific modifiers --- like
+    /// ``ResolvedModel3D/resizable()`` --- to the loaded model, use the
+    /// ``init(named:bundle:content:placeholder:)`` initializer instead.
+    ///
+    /// - Parameters:
+    ///   - name: The name of the USD or Reality file to display.
+    ///   - bundle: The Bundle used to look up the model by name. If not
+    ///     provided, defaults to the app's main bundle.
+    nonisolated public init(named name: String, bundle: Bundle? = nil) where Content == ResolvedModel3D
+
+    /// Loads and displays a modifiable model by name, by searching
+    /// through the specified <doc://com.apple.documentation/documentation/Foundation/Bundle>, using a custom placeholder
+    /// until the model loads.
+    ///
+    /// Until the model loads, ``Model3D`` displays the placeholder view that
+    /// you specify. When the load operation completes successfully, SwiftUI
+    /// updates the view to show content that you specify, which you
+    /// create using the loaded model. For example, you can show a green
+    /// placeholder, followed by a scaled version of the loaded model:
+    ///
+    /// ```swift
+    /// Model3D(named: "Robot-Drummer") { model in
+    ///     model.resizable()
+    /// } placeholder: {
+    ///     Color.green
+    /// }
+    /// ```
+    ///
+    /// If the load operation fails, ``Model3D`` continues to display the
+    /// placeholder. To be able to display a different view on a load error,
+    /// use the  ``Model3D/init(named:bundle:transaction:content:)`` initializer instead.
+    ///
+    /// - Parameters:
+    ///   - name: The name of the USD or Reality file to display.
+    ///   - bundle: The Bundle used to look up the model by name. If not
+    ///     provided, defaults to the app's main bundle.
+    ///   - content: A closure that takes the loaded model as an input, and
+    ///     returns the view to show. You can return the model directly, or
+    ///     modify it as needed before returning it.
+    ///   - placeholder: A closure that returns the view to show until the
+    ///     load operation completes successfully.
+    nonisolated public init<Model, Placeholder>(named name: String, bundle: Bundle? = nil, @ViewBuilder content: @escaping (ResolvedModel3D) -> Model, @ViewBuilder placeholder: @escaping () -> Placeholder) where Content == Model3DPlaceholderContent<Model, Placeholder>, Model : View, Placeholder : View
+
+    /// Loads and displays a modifiable model by name, by searching
+    /// through the specified <doc://com.apple.documentation/documentation/Foundation/Bundle>, in phases.
+    ///
+    /// Before the load operation completes, the phase is
+    /// ``Model3DPhase/empty``. After the operation completes, the phase
+    /// becomes either ``Model3DPhase/failure(_:)`` or
+    /// ``Model3DPhase/success(_:)``. In the first case, the phase's
+    /// ``Model3DPhase/error`` value indicates the reason for failure.
+    /// In the second case, the phase's ``Model3DPhase/model`` property
+    /// contains the loaded model. Use the phase to drive the output of the
+    /// `content` closure, which defines the view's appearance:
+    ///
+    /// ```swift
+    ///     Model3D(named: "Robot-Drummer") { phase in
+    ///         if let model = phase.model {
+    ///             model // Displays the loaded model.
+    ///         } else if phase.error != nil {
+    ///             Color.red // Indicates an error.
+    ///         } else {
+    ///             Color.blue // Acts as a placeholder.
+    ///         }
+    ///     }
+    ///  ```
+    ///
+    /// To add transitions when you change the name, apply an identifier to the
+    /// ``Model3D``.
+    ///
+    /// - Parameters:
+    ///   - name: The name of the USD or Reality file to display.
+    ///   - bundle: The Bundle used to look up the model by name. If not
+    ///     provided, defaults to the app's main bundle.
+    ///   - transaction: The transaction to use when the phase changes.
+    ///   - content: A closure that takes the load phase as an input, and
+    ///     returns the view to display for the specified phase.
+    nonisolated public init(named name: String, bundle: Bundle? = nil, transaction: Transaction = Transaction(), @ViewBuilder content: @escaping (Model3DPhase) -> Content)
+
+    /// The content and behavior of the view.
+    ///
+    /// When you implement a custom view, you must implement a computed
+    /// `body` property to provide the content for your view. Return a view
+    /// that's composed of built-in views that SwiftUI provides, plus other
+    /// composite views that you've already defined:
+    ///
+    ///     struct MyView: View {
+    ///         var body: some View {
+    ///             Text("Hello, World!")
+    ///         }
+    ///     }
+    ///
+    /// For more information about composing views and a view hierarchy,
+    /// see <doc:Declaring-a-Custom-View>.
+    @MainActor @preconcurrency public var body: some View { get }
+
+    /// The type of view representing the body of this view.
+    ///
+    /// When you create a custom view, Swift infers this type from your
+    /// implementation of the required ``View/body-swift.property`` property.
+    @available(visionOS 1.0, *)
+    @available(iOS, unavailable)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    @available(macOS, unavailable)
+    @available(macCatalyst, unavailable)
+    public typealias Body = some View
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, *)
+@available(iOS, unavailable)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension Model3D : Sendable {
+}
+
+// Available when SwiftUI is imported with RealityKit
+/// The current phase of the asynchronous model loading operation.
+///
+/// When you create a ``Model3D`` instance with the
+/// ``Model3D/init(url:transaction:content:)`` or
+/// ``Model3D/init(named:transaction:content:)`` initializers, you define
+/// the appearance of the view using a `content` closure. ``Model3D`` calls the
+/// closure with a phase value at different points during the load operation
+/// to indicate the current state. Use the phase to decide what to display.
+/// For example, you can display the loaded model if it exists, a view that
+/// indicates an error, or a placeholder:
+///
+/// ```swift
+/// let url = URL(string: "https://example.com/robot.usdz")!
+/// Model3D(url: url) { phase in
+///     if let model = phase.model {
+///         model // Displays the loaded model.
+///     } else if phase.error != nil {
+///         Color.red // Indicates an error.
+///     } else {
+///         ProgressView()
+///     }
+/// }
+/// ```
+@available(visionOS 1.0, *)
+@available(iOS, unavailable)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+public enum Model3DPhase {
+
+    /// No model is loaded.
+    case empty
+
+    /// A model has succesfully loaded.
+    case success(ResolvedModel3D)
+
+    /// An model failed to load with an error.
+    case failure(any Error)
+
+    /// The loaded model, if any.
+    ///
+    /// If this value isn't `nil`, the model load operation has finished,
+    /// and you can use the model to update the view. You can use the model
+    /// directly, or you can modify it in some way. For example, you can add
+    /// a ``ResolvedModel3D/resizable()`` modifier to make the
+    /// model resizable.
+    public var model: ResolvedModel3D? { get }
+
+    /// The error that occurred when attempting to load a model, if any.
+    public var error: (any Error)? { get }
+}
+
+// Available when SwiftUI is imported with RealityKit
+/// A container view that presents either a 3D model or a placeholder for one.
+///
+/// Don't instantiate this type directly. ``Model3D`` creates
+/// it for you.
+@available(visionOS 1.0, *)
+@available(iOS, unavailable)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+@MainActor @preconcurrency public struct Model3DPlaceholderContent<Model, Placeholder> : View where Model : View, Placeholder : View {
+
+    /// The content and behavior of the view.
+    ///
+    /// When you implement a custom view, you must implement a computed
+    /// `body` property to provide the content for your view. Return a view
+    /// that's composed of built-in views that SwiftUI provides, plus other
+    /// composite views that you've already defined:
+    ///
+    ///     struct MyView: View {
+    ///         var body: some View {
+    ///             Text("Hello, World!")
+    ///         }
+    ///     }
+    ///
+    /// For more information about composing views and a view hierarchy,
+    /// see <doc:Declaring-a-Custom-View>.
+    @MainActor @preconcurrency public var body: some View { get }
+
+    /// The type of view representing the body of this view.
+    ///
+    /// When you create a custom view, Swift infers this type from your
+    /// implementation of the required ``View/body-swift.property`` property.
+    @available(visionOS 1.0, *)
+    @available(iOS, unavailable)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    @available(macOS, unavailable)
+    @available(macCatalyst, unavailable)
+    public typealias Body = some View
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, *)
+@available(iOS, unavailable)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension Model3DPlaceholderContent : Sendable {
+}
+
+// Available when SwiftUI is imported with RealityKit
+/// A value that can be converted between SwiftUI `CoordinateSpace` and RealityKit `Entity`.
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+public protocol RealityCoordinateSpaceConverting {
+
+    func transform(from: some RealityCoordinateSpace, to: some CoordinateSpaceProtocol) -> AffineTransform3D
+
+    func transform(from: some CoordinateSpaceProtocol, to: some RealityCoordinateSpace) -> AffineTransform3D
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension RealityCoordinateSpaceConverting {
+
+    /// Converts a ``Point3D`` from a defined SwiftUI coordinate space to a 3D point in a RealityKit coordinate space.
+    public func convert(_ point: Point3D, from space: some CoordinateSpaceProtocol, to realitySpace: some RealityCoordinateSpace) -> SIMD3<Float>
+
+    /// Converts a 3D point from a RealityKit coordinate space to one in a SwiftUI coordinate space.
+    public func convert(point: SIMD3<Float>, from realitySpace: some RealityCoordinateSpace, to space: some CoordinateSpaceProtocol) -> Point3D
+
+    /// ConvConverts a 3D vector from a SwiftUI coordinate space to one in a RealityKit coordinate space.
+    public func convert(_ vector: Vector3D, from space: some CoordinateSpaceProtocol, to realitySpace: some RealityCoordinateSpace) -> SIMD3<Float>
+
+    /// Converts a 3D vector from a RealityKit coordinate space to one in a SwiftUI coordinate space.
+    public func convert(vector: SIMD3<Float>, from realitySpace: some RealityCoordinateSpace, to space: some CoordinateSpaceProtocol) -> Vector3D
+
+    /// Converts a Size3D from a defined SwiftUI coordinate space to a 3D size vector in a RealityKit coordinate space.
+    public func convert(_ size: Size3D, from space: some CoordinateSpaceProtocol, to realitySpace: some RealityCoordinateSpace) -> SIMD3<Float>
+
+    /// Converts a 3D size vector from a RealityKit coordinate space to a Size3D in a defined SwiftUI coordinate space.
+    public func convert(size: SIMD3<Float>, from realitySpace: some RealityCoordinateSpace, to space: some CoordinateSpaceProtocol) -> Size3D
+
+    /// Converts a Rect3D from a defined SwiftUI coordinate space to a BoundingBox in a RealityKit coordinate space.
+    public func convert(_ rect: Rect3D, from space: some CoordinateSpaceProtocol, to realitySpace: some RealityCoordinateSpace) -> BoundingBox
+
+    /// Converts a BoundingBox from a RealityKit coordinate space to a Rect3D in a defined SwiftUI coordinate space.
+    public func convert(boundingBox: BoundingBox, from realitySpace: some RealityCoordinateSpace, to space: some CoordinateSpaceProtocol) -> Rect3D
+
+    /// Returns a 3D Transform converted from a defined SwiftUI coordinate space to a RealityKit coordinate space.
+    ///
+    /// This function performs a change-of-basis operation, so the returned ``Transform`` performs the same transformation
+    /// in `realitySpace` that the specified ``AffineTransform3D`` performs in `space`.
+    public func convert(_ transform: AffineTransform3D, from space: some CoordinateSpaceProtocol, to realitySpace: some RealityCoordinateSpace) -> Transform
+
+    /// Returns an AffineTransform3D converted from a RealityKit coordinate space to a defined SwiftUI coordinate space.
+    ///
+    /// This function performs a change-of-basis operation, so the returned ``AffineTransform3D`` performs the same
+    /// transformation in `space` that the specified ``Transform`` performs in `realitySpace`.
+    public func convert(transform: Transform, from realitySpace: some RealityCoordinateSpace, to space: some CoordinateSpaceProtocol) -> AffineTransform3D
+
+    /// Converts a Rotation3D from a defined SwiftUI coordinate space to a quaternion in a RealityKit coordinate space.
+    ///
+    /// This function performs a change-of-basis operation, so the returned quaternion performs the same transformation in
+    /// `realitySpace` that the specified ``Rotation3D`` performs in `space`.
+    public func convert(_ rotation: Rotation3D, from space: some CoordinateSpaceProtocol, to realitySpace: some RealityCoordinateSpace) -> simd_quatf
+
+    /// Converts a quaternion from a RealityKit coordinate space to a Rotation3D in a defined SwiftUI coordinate space.
+    ///
+    /// This function performs a change-of-basis operation, so the returned ``Rotation3D`` performs the same transformation
+    /// in `space` that the specified quaternion performs in `realitySpace`.
+    public func convert(rotation: simd_quatf, from realitySpace: some RealityCoordinateSpace, to space: some CoordinateSpaceProtocol) -> Rotation3D
+}
+
+// Available when SwiftUI is imported with RealityKit
+/// A view that contains RealityKit content.
+///
+/// Use `RealityView` to display rich 3D RealityKit content in your
+/// app, including content you author in Reality Composer Pro.
+/// `RealityView` passes a structure that conforms to
+/// ``RealityViewContentProtocol`` to its `make` and
+/// `update` closures, which you can use to add and remove
+/// RealityKit entities to your view.
+///
+/// Here is a simple example showing how you can display a custom
+/// ``ModelEntity`` using `RealityView`:
+///
+/// ```swift
+/// struct ModelExample: View {
+///     var body: some View {
+///         RealityView { content in
+///             if let robot = try? await ModelEntity(named: "robot") {
+///                 content.add(robot)
+///             }
+///             Task {
+///                 // Asynchronously perform any additional work to configure
+///                 // the content after the system renders the view.
+///             }
+///         }
+///     }
+/// }
+/// ```
+///
+/// Note that the closure in the example above is `async`, and can be used
+/// to load contents from your app's bundle or from any `URL` in the background.
+/// While your content is loading, `RealityView` will automatically display a
+/// placeholder view, which you can customize using the optional `placeholder`
+/// parameter.
+///
+/// - Tip: Load your content asynchronously to
+///   avoid introducing a hang in your app.
+///
+/// You can also use the optional `update` closure on your `RealityView` to
+/// update your RealityKit content in response to changes in your view's state.
+/// `RealityView` displays your RealityKit content inline in true 3D
+/// space, occupying the available space in your app's 3D bounds.
+/// The ``RealityViewContent`` type on visionOS,
+/// and ``RealityViewCameraContent`` on other platforms
+/// represents the content of your `RealityView`.
+///
+/// `RealityView` has a flexible size by default, and does not size itself based
+/// on the RealityKit content it displays.
+/// For more advanced uses of RealityKit, such as subscribing to RealityKit
+/// events, performing coordinate conversions, or working with AR capabilities,
+/// refer to the ``RealityViewContentProtocol`` types.
+@available(visionOS 1.0, macOS 15.0, iOS 18.0, *)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+@MainActor @preconcurrency public struct RealityView<Content> : View where Content : View {
+
+    public typealias DefaultPlaceholder = RealityViewDefaultPlaceholder
+
+    /// The content and behavior of the view.
+    ///
+    /// When you implement a custom view, you must implement a computed
+    /// `body` property to provide the content for your view. Return a view
+    /// that's composed of built-in views that SwiftUI provides, plus other
+    /// composite views that you've already defined:
+    ///
+    ///     struct MyView: View {
+    ///         var body: some View {
+    ///             Text("Hello, World!")
+    ///         }
+    ///     }
+    ///
+    /// For more information about composing views and a view hierarchy,
+    /// see <doc:Declaring-a-Custom-View>.
+    @MainActor @preconcurrency public var body: some View { get }
+
+    /// The type of view representing the body of this view.
+    ///
+    /// When you create a custom view, Swift infers this type from your
+    /// implementation of the required ``View/body-swift.property`` property.
+    @available(iOS 18.0, visionOS 1.0, macOS 15.0, *)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    public typealias Body = some View
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension RealityView {
+
+    /// Creates a new reality view for visionOS with
+    /// an optional update closure
+    /// and placeholder view.
+    ///
+    /// - Parameters:
+    ///   - make: An asynchronous closure that configures the
+    ///     initial content of the new `RealityView`.
+    ///     This closure is asynchronous to keep your app's UI responsive while
+    ///     you load content to populate this view.
+    ///   - update: An optional closure that updates the `RealityView`
+    ///     instance's content as the view's state changes.
+    ///   - placeholder: A temporary view that the ``RealityView`` displays until
+    ///     your closure for the `make` parameter completes.
+    ///     For example, you can display a loading indicator with a
+    ///     <doc://com.apple.documentation/documentation/swiftui/progressview>
+    ///     instance as a placeholder.
+    ///
+    /// For example, your app can asynchronously load an ``Entity`` from a
+    /// `.reality` or `.usdz` file, and display a
+    /// <doc://com.apple.documentation/documentation/swiftui/progressview>
+    /// while the system loads the file:
+    ///
+    /// ```swift
+    /// RealityView { content in
+    ///     if let newEntity = try? await Entity(named: "model_file_name") {
+    ///         content.add(newEntity)
+    ///     }
+    /// } placeholder: {
+    ///     ProgressView()
+    /// }
+    /// ```
+    @available(visionOS 1.0, *)
+    @available(macOS, unavailable)
+    @available(macCatalyst, unavailable)
+    @available(iOS, unavailable)
+    @available(watchOS, unavailable)
+    @available(tvOS, unavailable)
+    nonisolated public init<P>(make: @escaping @MainActor @Sendable (inout RealityViewContent) async -> Void, update: (@MainActor (inout RealityViewContent) -> Void)? = nil, @ViewBuilder placeholder: () -> P) where Content == RealityViewContent.Body<P>, P : View
+
+    /// Creates a new reality view for visionOS with
+    /// an optional update closure.
+    ///
+    /// - Parameters:
+    ///   - make: An asynchronous closure that configures the
+    ///     initial content of the new `RealityView`.
+    ///     This closure is asynchronous to keep your app's UI responsive while
+    ///     you load content to populate this view.
+    ///   - update: An optional closure that updates the `RealityView`
+    ///     instance's content as the view's state changes.
+    ///
+    /// Use the `update` closure to modify entities in the scene
+    /// based on a Boolean state property, like in the following example:
+    ///
+    /// ```swift
+    /// RealityView { content in
+    ///     content.add(boxEntity)
+    /// } update: { content in
+    ///     boxEntity.scale = isEnlarged ? .one * 2 : .one
+    /// }
+    /// ```
+    @available(visionOS 1.0, *)
+    @available(macOS, unavailable)
+    @available(macCatalyst, unavailable)
+    @available(iOS, unavailable)
+    @available(watchOS, unavailable)
+    @available(tvOS, unavailable)
+    nonisolated public init(make: @escaping @MainActor @Sendable (inout RealityViewContent) async -> Void, update: (@MainActor (inout RealityViewContent) -> Void)? = nil) where Content == RealityViewContent.Body<RealityViewDefaultPlaceholder>
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension RealityView {
+
+    /// Creates a reality view for visionOS, with attachments
+    /// and an optional update closure.
+    ///
+    /// - Parameters:
+    ///   - make: An asynchronous closure that configures the
+    ///     initial content of the new `RealityView`.
+    ///     This closure is asynchronous to keep your app's UI responsive while
+    ///     you load content to populate this view.
+    ///   - update: An optional closure that updates the `RealityView`
+    ///     instance's content as the view's state changes.
+    ///   - attachments: An attachment content builder that adds attachment
+    ///     views to the content of the `RealityView`.
+    ///
+    /// This initializer doesn't automatically add the attachment views to your ``RealityViewContent``.
+    /// You can access the entities that represent the attachments by calling
+    /// the ``RealityViewAttachments/entity(for:)`` method of the
+    /// ``RealityViewAttachments``, and add them to your content or as a child of another ``Entity``:
+    ///
+    /// ```swift
+    /// RealityView { content, attachments in
+    ///     if let attachment = attachments.entity(for: "example") {
+    ///         content.add(attachment)
+    ///     }
+    /// } attachments: {
+    ///     Attachment(id: "example") {
+    ///         Text("hello")
+    ///     }
+    /// }
+    /// ```
+    nonisolated public init<A>(make: @escaping @MainActor @Sendable (inout RealityViewContent, RealityViewAttachments) async -> Void, update: (@MainActor (inout RealityViewContent, RealityViewAttachments) -> Void)? = nil, @AttachmentContentBuilder attachments: @escaping () -> A) where Content == RealityViewAttachmentBuilderContent<A, RealityViewContent.Body<RealityViewDefaultPlaceholder>>, A : AttachmentContent
+
+    /// Creates a reality view for visionOS, with attachments,
+    /// an optional update closure,
+    /// and placeholder view.
+    ///
+    /// - Parameters:
+    ///   - make: An asynchronous closure that configures the
+    ///     initial content of the new `RealityView`.
+    ///     This closure is asynchronous to keep your app's UI responsive while
+    ///     you load content to populate this view.
+    ///   - update: An optional closure that updates the `RealityView`
+    ///     instance's content as the view's state changes.
+    ///   - placeholder: A temporary view that the ``RealityView`` displays until
+    ///     your closure for the `make` parameter completes.
+    ///     For example, you can display a loading indicator with a
+    ///     <doc://com.apple.documentation/documentation/swiftui/progressview>
+    ///     instance as a placeholder.
+    ///   - attachments: An attachment content builder that adds attachment
+    ///     views to the content of the `RealityView`.
+    ///
+    /// This initializer doesn't automatically add the attachment views to your ``RealityViewContent``.
+    /// You can access the entities that represent the attachments by calling
+    /// the ``RealityViewAttachments/entity(for:)`` method of the
+    /// ``RealityViewAttachments``, and add them to your content or as a child of another ``Entity``:
+    ///
+    /// ```swift
+    /// RealityView { content, attachments in
+    ///     if let attachment = attachments.entity(for: "example") {
+    ///         content.add(attachment)
+    ///     }
+    /// } attachments: {
+    ///     Attachment(id: "example") {
+    ///         Text("hello")
+    ///     }
+    /// }
+    /// ```
+    nonisolated public init<A, P>(make: @escaping @MainActor @Sendable (inout RealityViewContent, RealityViewAttachments) async -> Void, update: (@MainActor (inout RealityViewContent, RealityViewAttachments) -> Void)? = nil, @ViewBuilder placeholder: () -> P, @AttachmentContentBuilder attachments: @escaping () -> A) where Content == RealityViewAttachmentBuilderContent<A, RealityViewContent.Body<P>>, A : AttachmentContent, P : View
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, macOS 15.0, iOS 18.0, *)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension RealityView : Sendable {
+}
+
+// Available when SwiftUI is imported with RealityKit
+/// A view that gathers the attachment content for your current reality view.
+///
+/// A ``RealityView`` creates this for you.
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+@MainActor @preconcurrency public struct RealityViewAttachmentBuilderContent<Attachment, Content> : View where Attachment : AttachmentContent, Content : View {
+
+    /// The content and behavior of the view.
+    ///
+    /// When you implement a custom view, you must implement a computed
+    /// `body` property to provide the content for your view. Return a view
+    /// that's composed of built-in views that SwiftUI provides, plus other
+    /// composite views that you've already defined:
+    ///
+    ///     struct MyView: View {
+    ///         var body: some View {
+    ///             Text("Hello, World!")
+    ///         }
+    ///     }
+    ///
+    /// For more information about composing views and a view hierarchy,
+    /// see <doc:Declaring-a-Custom-View>.
+    @MainActor @preconcurrency public var body: some View { get }
+
+    /// The type of view representing the body of this view.
+    ///
+    /// When you create a custom view, Swift infers this type from your
+    /// implementation of the required ``View/body-swift.property`` property.
+    @available(visionOS 1.0, *)
+    @available(iOS, unavailable)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    @available(macOS, unavailable)
+    @available(macCatalyst, unavailable)
+    public typealias Body = some View
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension RealityViewAttachmentBuilderContent : Sendable {
+}
+
+// Available when SwiftUI is imported with RealityKit
+/// The attachments that belong to a RealityView.
+///
+/// Use this type to access entities associated with the attachments you provide
+/// to your ``RealityView`` via the ``RealityView/init(make:update:attachments:)``
+/// initializer.
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+public struct RealityViewAttachments {
+
+    /// Gets the identified attachment view as an entity, if the view with that
+    /// identifier exists.
+    ///
+    /// Attachment entities are not automatically added to your
+    /// ``RealityView``'s content. To display an attachment, add it to your
+    /// ``RealityView``'s content using a function like
+    /// ``RealityViewContent/add(_:)``.
+    ///
+    /// - Parameter id: The value that you used to tag the view when you
+    ///   define it in the `attachments` parameter of the ``RealityView``
+    ///   initializer ``RealityView/init(make:update:attachments:)``.
+    /// - Returns: The resolved attachment entity, or `nil` if ``RealityView``
+    ///   can't find an attachment view with the given `id`.
+    public func entity(for id: some Hashable) -> ViewAttachmentEntity?
+}
+
+// Available when SwiftUI is imported with RealityKit
+/// The content of a visionOS reality view.
+///
+/// Add content that you want your visionOS app to display
+/// to a `RealityViewContent`.
+///
+/// You can use `RealityViewContent` to add and remove entities, subscribe to
+/// RealityKit events, and perform coordinate conversions between RealityKit
+/// entity space and a SwiftUI View's coordinate space.
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+public struct RealityViewContent : RealityViewContentProtocol {
+
+    /// A collection of RealityKit entities that this view content
+    /// renders within the scene.
+    public var entities: RealityViewEntityCollection { get nonmutating set }
+
+    /// Subscribes to an event type, optionally limited to
+    /// events affecting a source entity or scene,
+    /// or a specific component type for component events.
+    ///
+    /// - Parameters:
+    ///   - event: The event type to subscribe to.
+    ///     For example, ``SceneEvents/Update`` or ``ComponentEvents/DidActivate``.
+    ///   - sourceObject: An optional source for the event, such as an entity or a scene.
+    ///     Set to `nil` to listen for all events of the event type within the ``RealityViewContent``.
+    ///   - componentType: An optional component type to filter events to if the event is of the type ``ComponentEvents``.
+    ///     Set to `nil` to listen for all events of the event type within the ``RealityViewContent``.
+    ///   - handler: A closure that runs when the `event` occurs.
+    ///
+    /// - Returns: An object that represents the subscription to this event stream.
+    public func subscribe<E>(to event: E.Type, on sourceObject: (any EventSource)?, componentType: (any Component.Type)?, _ handler: @escaping (E) -> Void) -> EventSubscription where E : Event
+
+    /// The type of collection used for `entities`.
+    @available(visionOS 1.0, *)
+    @available(iOS, unavailable)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    @available(macOS, unavailable)
+    @available(macCatalyst, unavailable)
+    public typealias Entities = RealityViewEntityCollection
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension RealityViewContent {
+
+    /// The default view contents of a reality view, using reality view content.
+    ///
+    /// You don't create this type directly. ``RealityView`` creates values for
+    /// you.
+    @MainActor @preconcurrency public struct Body<Placeholder> : View where Placeholder : View {
+
+        /// The content and behavior of the view.
+        ///
+        /// When you implement a custom view, you must implement a computed
+        /// `body` property to provide the content for your view. Return a view
+        /// that's composed of built-in views that SwiftUI provides, plus other
+        /// composite views that you've already defined:
+        ///
+        ///     struct MyView: View {
+        ///         var body: some View {
+        ///             Text("Hello, World!")
+        ///         }
+        ///     }
+        ///
+        /// For more information about composing views and a view hierarchy,
+        /// see <doc:Declaring-a-Custom-View>.
+        @MainActor @preconcurrency public var body: some View { get }
+
+        /// The type of view representing the body of this view.
+        ///
+        /// When you create a custom view, Swift infers this type from your
+        /// implementation of the required ``View/body-swift.property`` property.
+        @available(visionOS 1.0, *)
+        @available(iOS, unavailable)
+        @available(tvOS, unavailable)
+        @available(watchOS, unavailable)
+        @available(macOS, unavailable)
+        @available(macCatalyst, unavailable)
+        public typealias Body = some View
+    }
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension RealityViewContent : RealityCoordinateSpaceConverting, RealityCoordinateSpace {
+
+    public func transform(from: some RealityCoordinateSpace, to: some CoordinateSpaceProtocol) -> AffineTransform3D
+
+    public func transform(from: some CoordinateSpaceProtocol, to: some RealityCoordinateSpace) -> AffineTransform3D
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension RealityViewContent.Body : Sendable {
+}
+
+// Available when SwiftUI is imported with RealityKit
+/// A protocol representing the content of a reality view.
+///
+/// Do not interface with this protocol directly. Instead, use ``RealityViewContent``
+/// with your ``RealityView``.
+@available(visionOS 1.0, macOS 15.0, iOS 18.0, *)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+public protocol RealityViewContentProtocol {
+
+    /// The type of collection used for `entities`.
+    associatedtype Entities : EntityCollection
+
+    /// A collection of RealityKit entities that this view content
+    /// renders within the scene.
+    var entities: Self.Entities { get nonmutating set }
+
+    /// Subscribes to an event type, optionally limited to
+    /// events affecting a source entity or scene,
+    /// or a specific component type for component events.
+    ///
+    /// - Parameters:
+    ///   - event: The event type to subscribe to.
+    ///     For example, ``SceneEvents/Update`` or ``ComponentEvents/DidActivate``.
+    ///   - sourceObject: An optional source for the event, such as an entity or a scene.
+    ///     Set to `nil` to listen for all events of the event type within the ``RealityViewContent``.
+    ///   - componentType: An optional component type to filter events to if the event is of the type ``ComponentEvents``.
+    ///     Set to `nil` to listen for all events of the event type within the view content.
+    ///   - handler: A closure that runs when the `event` occurs.
+    ///
+    /// - Returns: An object that represents the subscription to this event stream.
+    func subscribe<E>(to event: E.Type, on sourceObject: (any EventSource)?, componentType: (any Component.Type)?, _ handler: @escaping (E) -> Void) -> EventSubscription where E : Event
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, macOS 15.0, iOS 18.0, *)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension RealityViewContentProtocol {
+
+    /// Subscribes to an event type, optionally limited to
+    /// events affecting a source entity or scene.
+    ///
+    /// - Parameters:
+    ///   - event: The event type to subscribe to.
+    ///     For example, ``SceneEvents/Update`` or ``ComponentEvents/DidActivate``.
+    ///   - sourceObject: An optional source for the event, such as an entity or a scene.
+    ///     Set to `nil` to listen for all events of the event type within the view content.
+    ///   - handler: A closure that runs when the `event` occurs.
+    ///
+    /// - Returns: An object that represents the subscription to this event stream.
+    public func subscribe<E>(to event: E.Type, on sourceObject: (any EventSource)?, _ handler: @escaping (E) -> Void) -> EventSubscription where E : Event
+
+    /// Subscribes to an event type, optionally limited to
+    /// a specific component type for component events.
+    ///
+    /// Events you can subscribe to including scene updates,
+    /// ``SceneEvents/Update``, or when an animation
+    /// ends, ``AnimationEvents/PlaybackCompleted``.
+    ///
+    /// - Parameters:
+    ///   - event: The event type to subscribe to.
+    ///     For example, ``SceneEvents/Update`` or ``ComponentEvents/DidActivate``.
+    ///   - componentType: An optional component type to filter events to if the event is of the type ``ComponentEvents``.
+    ///     Set to `nil` to listen for all events of the event type within the view content.
+    ///   - handler: A closure that runs when the `event` occurs.
+    ///
+    /// - Returns: An object that represents the subscription to this event stream.
+    public func subscribe<E>(to event: E.Type, componentType: (any Component.Type)? = nil, _ handler: @escaping (E) -> Void) -> EventSubscription where E : Event
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, macOS 15.0, iOS 18.0, *)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension RealityViewContentProtocol {
+
+    /// Adds an entity to this content.
+    public func add(_ entity: Entity)
+
+    /// Removes an entity from this content, if present.
+    public func remove(_ entity: Entity)
+}
+
+// Available when SwiftUI is imported with RealityKit
+/// A view that represents the default placeholder for a RealityView.
+///
+/// You don't directly create instances of this type because ``RealityView`` creates them for you.
+@available(visionOS 1.0, macOS 15.0, iOS 18.0, *)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+@MainActor @preconcurrency public struct RealityViewDefaultPlaceholder : View {
+
+    /// The content and behavior of the view.
+    ///
+    /// When you implement a custom view, you must implement a computed
+    /// `body` property to provide the content for your view. Return a view
+    /// that's composed of built-in views that SwiftUI provides, plus other
+    /// composite views that you've already defined:
+    ///
+    ///     struct MyView: View {
+    ///         var body: some View {
+    ///             Text("Hello, World!")
+    ///         }
+    ///     }
+    ///
+    /// For more information about composing views and a view hierarchy,
+    /// see <doc:Declaring-a-Custom-View>.
+    @MainActor @preconcurrency public var body: some View { get }
+
+    /// The type of view representing the body of this view.
+    ///
+    /// When you create a custom view, Swift infers this type from your
+    /// implementation of the required ``View/body-swift.property`` property.
+    @available(iOS 18.0, visionOS 1.0, macOS 15.0, *)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    public typealias Body = some View
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, macOS 15.0, iOS 18.0, *)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension RealityViewDefaultPlaceholder : Sendable {
+}
+
+// Available when SwiftUI is imported with RealityKit
+/// A collection of entities in a RealityView.
+///
+/// This collection is used by ``RealityViewContent/entities``.
+@available(visionOS 1.0, macOS 15.0, iOS 18.0, *)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+public struct RealityViewEntityCollection : EntityCollection {
+
+    /// The position of the first element in a nonempty collection.
+    ///
+    /// If the collection is empty, `startIndex` is equal to `endIndex`.
+    public var startIndex: Int { get }
+
+    /// The collection's "past the end" position---that is, the position one
+    /// greater than the last valid subscript argument.
+    ///
+    /// When you need a range that includes the last element of a collection, use
+    /// the half-open range operator (`..<`) with `endIndex`. The `..<` operator
+    /// creates a range that doesn't include the upper bound, so it's always
+    /// safe to use with `endIndex`. For example:
+    ///
+    ///     let numbers = [10, 20, 30, 40, 50]
+    ///     if let index = numbers.firstIndex(of: 30) {
+    ///         print(numbers[index ..< numbers.endIndex])
+    ///     }
+    ///     // Prints "[30, 40, 50]"
+    ///
+    /// If the collection is empty, `endIndex` is equal to `startIndex`.
+    public var endIndex: Int { get }
+
+    /// The number of elements in the collection.
+    ///
+    /// To check whether a collection is empty, use its `isEmpty` property
+    /// instead of comparing `count` to zero. Unless the collection guarantees
+    /// random-access performance, calculating `count` can be an O(*n*)
+    /// operation.
+    ///
+    /// - Complexity: O(1) if the collection conforms to
+    ///   `RandomAccessCollection`; otherwise, O(*n*), where *n* is the length
+    ///   of the collection.
+    public var count: Int { get }
+
+    /// Accesses the element at the specified position.
+    ///
+    /// The following example accesses an element of an array through its
+    /// subscript to print its value:
+    ///
+    ///     var streets = ["Adams", "Bryant", "Channing", "Douglas", "Evarts"]
+    ///     print(streets[1])
+    ///     // Prints "Bryant"
+    ///
+    /// You can subscript a collection with any valid index other than the
+    /// collection's end index. The end index refers to the position one past
+    /// the last element of a collection, so it doesn't correspond with an
+    /// element.
+    ///
+    /// - Parameter position: The position of the element to access. `position`
+    ///   must be a valid index of the collection that is not equal to the
+    ///   `endIndex` property.
+    ///
+    /// - Complexity: O(1)
+    public subscript(index: Int) -> Entity { get }
+
+    /// Returns the position immediately after the given index.
+    ///
+    /// The successor of an index must be well defined. For an index `i` into a
+    /// collection `c`, calling `c.index(after: i)` returns the same index every
+    /// time.
+    ///
+    /// - Parameter i: A valid index of the collection. `i` must be less than
+    ///   `endIndex`.
+    /// - Returns: The index value immediately after `i`.
+    public func index(after i: Int) -> Int
+
+    /// Adds the specified sequence of entities to this collection in order,
+    /// directly before the entity at the given index.
+    ///
+    /// - Parameters:
+    ///   - sequence:                  A sequence of entities to add to the collection.
+    ///   - index:                     The index of an entity to insert in front
+    ///                                of. If `endIndex` is provided, the
+    ///                                entities will be appended.
+    ///
+    /// > Note: This operation can invalidate the index order of any extant entities.
+    public mutating func insert<S>(contentsOf sequence: S, beforeIndex index: Int) where S : Sequence, S.Element : Entity
+
+    /// Adds the specified sequence of entities to the end of this collection,
+    /// in order.
+    ///
+    /// - Parameters:
+    ///   - sequence:                 The entities to add to the collection.
+    ///
+    /// > Note: This operation can invalidate the index order of any extant entities.
+    public mutating func append<S>(contentsOf sequence: S) where S : Sequence, S.Element : Entity
+
+    /// Removes the entity from the collection.
+    ///
+    /// - Parameters:
+    ///   - entity:                    The entity to remove from the collection.
+    ///
+    /// > Note: This operation can invalidate the index order of any remaining entities.
+    public mutating func remove(_ child: Entity)
+
+    /// Removes the entity at the given index from this collection.
+    ///
+    /// - Parameters:
+    ///   - index:                    The index of the entity to remove from the collection.
+    ///
+    /// > Note: This operation can invalidate the index order of any remaining entities.
+    public mutating func remove(at index: Int)
+
+    /// Removes all entities from this collection.
+    public mutating func removeAll()
+
+    /// Replaces all entities in this collection with those from the given
+    /// sequence.
+    ///
+    /// - Parameters:
+    ///   - entities:                 The sequence of entities that will replace
+    ///                               the collection's current contents.
+    ///
+    /// > Note: This operation might not maintain the new entities' index order.
+    public mutating func replaceAll<S>(_ children: S) where S : Sequence, S.Element : Entity
+
+    /// A type representing the sequence's elements.
+    @available(iOS 18.0, visionOS 1.0, macOS 15.0, *)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    public typealias Element = Entity
+
+    /// A type that represents a position in the collection.
+    ///
+    /// Valid indices consist of the position of every element and a
+    /// "past the end" position that's not valid for use as a subscript
+    /// argument.
+    @available(iOS 18.0, visionOS 1.0, macOS 15.0, *)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    public typealias Index = Int
+
+    /// A type that represents the indices that are valid for subscripting the
+    /// collection, in ascending order.
+    @available(iOS 18.0, visionOS 1.0, macOS 15.0, *)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    public typealias Indices = DefaultIndices<RealityViewEntityCollection>
+
+    /// A type that provides the collection's iteration interface and
+    /// encapsulates its iteration state.
+    ///
+    /// By default, a collection conforms to the `Sequence` protocol by
+    /// supplying `IndexingIterator` as its associated `Iterator`
+    /// type.
+    @available(iOS 18.0, visionOS 1.0, macOS 15.0, *)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    public typealias Iterator = IndexingIterator<RealityViewEntityCollection>
+
+    /// A collection representing a contiguous subrange of this collection's
+    /// elements. The subsequence shares indices with the original collection.
+    ///
+    /// The default subsequence type for collections that don't define their own
+    /// is `Slice`.
+    @available(iOS 18.0, visionOS 1.0, macOS 15.0, *)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    public typealias SubSequence = Slice<RealityViewEntityCollection>
+}
+
+// Available when SwiftUI is imported with RealityKit
+/// A view for displaying static three-dimensional models.
+///
+/// You don't instantiate this type directly, instead ``Model3D`` creates
+/// instances for you.
+@available(visionOS 1.0, *)
+@available(iOS, unavailable)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+@MainActor @preconcurrency public struct ResolvedModel3D : View {
+
+    /// The content and behavior of the view.
+    ///
+    /// When you implement a custom view, you must implement a computed
+    /// `body` property to provide the content for your view. Return a view
+    /// that's composed of built-in views that SwiftUI provides, plus other
+    /// composite views that you've already defined:
+    ///
+    ///     struct MyView: View {
+    ///         var body: some View {
+    ///             Text("Hello, World!")
+    ///         }
+    ///     }
+    ///
+    /// For more information about composing views and a view hierarchy,
+    /// see <doc:Declaring-a-Custom-View>.
+    @MainActor @preconcurrency public var body: some View { get }
+
+    /// Allows this model to resize itself to fit its container.
+    /// - Note: By default, `Model3D` sizes itself based on the intrinsic size
+    ///   of the underlying model file. Setting this will scale the model to
+    ///   fit its container instead. To preserve the intrinsic aspect ratio of
+    ///   the model, use <doc://com.apple.documentation/documentationSwiftUI/View/aspectRatio(_:contentMode:)>.
+    @MainActor @preconcurrency public func resizable(_ isResizable: Bool = true) -> ResolvedModel3D
+
+    /// The type of view representing the body of this view.
+    ///
+    /// When you create a custom view, Swift infers this type from your
+    /// implementation of the required ``View/body-swift.property`` property.
+    @available(visionOS 1.0, *)
+    @available(iOS, unavailable)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    @available(macOS, unavailable)
+    @available(macCatalyst, unavailable)
+    public typealias Body = some View
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, *)
+@available(iOS, unavailable)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension ResolvedModel3D : Sendable {
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+@MainActor @frozen @preconcurrency public struct TupleAttachmentContent<T> : AttachmentContent {
+
+    @available(visionOS 1.0, *)
+    @available(iOS, unavailable)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    @available(macOS, unavailable)
+    @available(macCatalyst, unavailable)
+    public typealias Body = Never
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension TupleAttachmentContent : Sendable {
+}
+
+// Available when SwiftUI is imported with RealityKit
+/// A component containing additional information about a view attachment
+/// entity provided  via the ``RealityViewAttachments/entity(for:)``
+/// function.
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+public struct ViewAttachmentComponent : TransientComponent, Identifiable {
+
+    /// The identifier used for this view attachment.
+    public var id: AnyHashable { get }
+
+    /// The bounding box of the view attachment, expressed in meters.
+    public var bounds: BoundingBox { get }
+
+    /// A type representing the stable identity of the entity associated with
+    /// an instance.
+    @available(visionOS 1.0, *)
+    @available(iOS, unavailable)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    @available(macOS, unavailable)
+    @available(macCatalyst, unavailable)
+    public typealias ID = AnyHashable
+}
+
+// Available when SwiftUI is imported with RealityKit
+/// An entity that has a view attachment.
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+@MainActor @preconcurrency public class ViewAttachmentEntity : Entity {
+
+    /// The view attachment component for this entity.
+    @MainActor @preconcurrency public var attachment: ViewAttachmentComponent { get }
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension Never : AttachmentContent {
+
+    @MainActor @preconcurrency public var body: Never { get }
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension Optional : AttachmentContent where Wrapped : AttachmentContent {
+
+    @MainActor @preconcurrency public var body: Never { get }
+
+    @available(visionOS 1.0, *)
+    @available(iOS, unavailable)
+    @available(tvOS, unavailable)
+    @available(watchOS, unavailable)
+    @available(macOS, unavailable)
+    @available(macCatalyst, unavailable)
+    public typealias Body = Never
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension ForEach : AttachmentContent where Content : AttachmentContent {
+
+    @MainActor @preconcurrency public var body: Never { get }
+
+    @available(visionOS 1.0, *)
+    @available(iOS, unavailable, introduced: 13.0)
+    @available(tvOS, unavailable, introduced: 13.0)
+    @available(watchOS, unavailable, introduced: 6.0)
+    @available(macOS, unavailable, introduced: 10.15)
+    @available(macCatalyst, unavailable)
+    public typealias Body = Never
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension ForEach where ID == Data.Element.ID, Content : AttachmentContent, Data.Element : Identifiable {
+
+    public init(_ data: Data, @AttachmentContentBuilder content: @escaping (Data.Element) -> Content)
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension ForEach where Content : AttachmentContent {
+
+    public init(_ data: Data, id: KeyPath<Data.Element, ID>, @AttachmentContentBuilder content: @escaping (Data.Element) -> Content)
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, *)
+@available(macOS, unavailable)
+@available(macCatalyst, unavailable)
+@available(iOS, unavailable)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension EnvironmentValues {
+
+    public var realityKitScene: Scene? { get }
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 2.0, macOS 15.0, iOS 18.0, *)
+extension MeshResource {
+
+    /// Synchronously generates a 3D mesh by extruding a 2D path.
+    ///
+    /// - Parameters:
+    ///   - path: A path that contains the starting shape for the 3D mesh geometry.
+    ///   - extrusionOptions: A configuration for extruding the path in 3D.
+    ///
+    /// The filled area of the path is determined using the even-odd winding rule (see
+    /// [Filling a Path](https://developer.apple.com/library/archive/documentation/GraphicsImaging/Conceptual/drawingwithquartz2d/dq_paths/dq_paths.html#//apple_ref/doc/uid/TP30001066-CH211-TPXREF106)
+    /// in the [Quartz 2D Programming Guide Guide](https://developer.apple.com/library/archive/documentation/GraphicsImaging/Conceptual/drawingwithquartz2d/Introduction/Introduction.html )).
+    /// The provided path needs to satisfy the following conditions, or behavior is undefined:
+    /// 1. Subpaths contains no self intersections.
+    /// 2. Subpaths do not intersect each other.
+    /// 3. All subpaths are closed.
+    @MainActor @preconcurrency public convenience init(extruding path: Path, extrusionOptions: MeshResource.ShapeExtrusionOptions = ShapeExtrusionOptions()) throws
+
+    /// Asynchronously generates a 3D mesh by extruding a 2D path.
+    ///
+    /// - Parameters:
+    ///   - path: A path that contains the starting shape for the 3D mesh geometry.
+    ///   - extrusionOptions: A configuration for extruding the path in 3D.
+    ///
+    /// The filled area of the path is determined using the even-odd winding rule (see
+    /// [Filling a Path](https://developer.apple.com/library/archive/documentation/GraphicsImaging/Conceptual/drawingwithquartz2d/dq_paths/dq_paths.html#//apple_ref/doc/uid/TP30001066-CH211-TPXREF106)
+    /// in the [Quartz 2D Programming Guide Guide](https://developer.apple.com/library/archive/documentation/GraphicsImaging/Conceptual/drawingwithquartz2d/Introduction/Introduction.html )).
+    /// The provided path needs to satisfy the following conditions, or behavior is undefined:
+    /// 1. Subpaths contains no self intersections.
+    /// 2. Subpaths do not intersect each other.
+    /// 3. All subpaths are closed.
+    nonisolated public convenience init(extruding path: Path, extrusionOptions: MeshResource.ShapeExtrusionOptions = ShapeExtrusionOptions()) async throws
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 2.0, macOS 15.0, iOS 18.0, *)
+extension MeshResource.ShapeExtrusionOptions {
+
+    /// A path that determines the cross-sectional contour of each chamfered edge.
+    ///
+    /// - Note: If the chamfer profile is `nil`, a circular profile is used.
+    ///
+    /// The chamfer profile needs to satisfy the following conditions:
+    /// * The path is nonempty.
+    /// * The first point on the path is at (0, 0) and the last point is at (1, 1).
+    /// * The value of x along the profile either increases or stays the same.
+    ///   In other words, the profile curve may not wrap back on itself.
+    ///
+    /// To learn more about SwiftUI's
+    /// <doc://com.apple.documentation/documentation/swiftui/path>
+    /// structure, see
+    /// <doc://com.apple.documentation/tutorials/swiftui/drawing-paths-and-shapes>.
+    public var chamferProfile: Path?
+}
+
+// Available when SwiftUI is imported with RealityKit
+@available(visionOS 1.0, macOS 15.0, iOS 18.0, *)
+@available(watchOS, unavailable)
+@available(tvOS, unavailable)
+extension Gesture {
+
+    /// Requires this gesture to target an entity.
+    ///
+    /// - Returns: A `RealityCoordinateSpaceConvertible`value containing
+    ///   the original gesture value along with the targeted entity.
+    @available(visionOS 1.0, macOS 15.0, iOS 18.0, *)
+    @available(watchOS, unavailable)
+    @available(tvOS, unavailable)
+    @MainActor @preconcurrency public func targetedToAnyEntity() -> some Gesture<EntityTargetValue<Self.Value>>
+
+
+    /// Requires this gesture to target an entity or a descendant of entity.
+    ///
+    /// - Parameter entity: The entity the gesture targets.
+    ///
+    /// - Returns: A `RealityCoordinateSpaceConverting` value containing
+    ///   the original gesture value along with the targeted entity.
+    @available(visionOS 1.0, macOS 15.0, iOS 18.0, *)
+    @available(watchOS, unavailable)
+    @available(tvOS, unavailable)
+    @MainActor @preconcurrency public func targetedToEntity(_ entity: Entity) -> some Gesture<EntityTargetValue<Self.Value>>
+
+
+    /// Requires this gesture to target an entity that can be found in the results of the query.
+    ///
+    /// - Parameter query: A query to filter which entity the gesture targets.
+    ///
+    /// - Returns: A `RealityCoordinateSpaceConverting` value containing
+    ///   the original gesture value along with the targeted entity.
+    @available(visionOS 1.0, macOS 15.0, iOS 18.0, *)
+    @available(watchOS, unavailable)
+    @available(tvOS, unavailable)
+    @MainActor @preconcurrency public func targetedToEntity(where query: QueryPredicate<Entity>) -> some Gesture<EntityTargetValue<Self.Value>>
+
+}
+

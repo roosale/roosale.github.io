@@ -1,0 +1,529 @@
+import Metal.MTLAccelerationStructure
+import Metal.MTLAccelerationStructureCommandEncoder
+import Metal.MTLAccelerationStructureTypes
+import Metal.MTLAllocation
+import Metal.MTLArgument
+import Metal.MTLArgumentEncoder
+import Metal.MTLBinaryArchive
+import Metal.MTLBlitCommandEncoder
+import Metal.MTLBlitPass
+import Metal.MTLBuffer
+import Metal.MTLCaptureManager
+import Metal.MTLCaptureScope
+import Metal.MTLCommandBuffer
+import Metal.MTLCommandEncoder
+import Metal.MTLCommandQueue
+import Metal.MTLComputeCommandEncoder
+import Metal.MTLComputePass
+import Metal.MTLComputePipeline
+import Metal.MTLCounters
+import Metal.MTLDefines
+import Metal.MTLDepthStencil
+import Metal.MTLDevice
+import Metal.MTLDeviceCertification
+import Metal.MTLDrawable
+import Metal.MTLDynamicLibrary
+import Metal.MTLEvent
+import Metal.MTLFence
+import Metal.MTLFunctionConstantValues
+import Metal.MTLFunctionDescriptor
+import Metal.MTLFunctionHandle
+import Metal.MTLFunctionLog
+import Metal.MTLFunctionStitching
+import Metal.MTLHeap
+import Metal.MTLIOCommandBuffer
+import Metal.MTLIOCommandQueue
+import Metal.MTLIOCompressor
+import Metal.MTLIndirectCommandBuffer
+import Metal.MTLIndirectCommandEncoder
+import Metal.MTLIntersectionFunctionTable
+import Metal.MTLLibrary
+import Metal.MTLLinkedFunctions
+import Metal.MTLLogState
+import Metal.MTLParallelRenderCommandEncoder
+import Metal.MTLPipeline
+import Metal.MTLPixelFormat
+import Metal.MTLRasterizationRate
+import Metal.MTLRenderCommandEncoder
+import Metal.MTLRenderPass
+import Metal.MTLRenderPipeline
+import Metal.MTLResidencySet
+import Metal.MTLResource
+import Metal.MTLResourceStateCommandEncoder
+import Metal.MTLResourceStatePass
+import Metal.MTLSampler
+import Metal.MTLStageInputOutputDescriptor
+import Metal.MTLTexture
+import Metal.MTLTypes
+import Metal.MTLVertexDescriptor
+import Metal.MTLVisibleFunctionTable
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+
+@available(macOS 11.0, iOS 14.0, tvOS 14.0, *)
+public struct MTLLogContainer : Sequence {
+
+    /// A type representing the sequence's elements.
+    public typealias Element = MTLFunctionLog
+
+    /// A type that provides the sequence's iteration interface and
+    /// encapsulates its iteration state.
+    public struct Iterator : IteratorProtocol {
+
+        /// Advances to the next element and returns it, or `nil` if no next element
+        /// exists.
+        ///
+        /// Repeatedly calling this method returns, in order, all the elements of the
+        /// underlying sequence. As soon as the sequence has run out of elements, all
+        /// subsequent calls return `nil`.
+        ///
+        /// You must not call this method if any other copy of this iterator has been
+        /// advanced with a call to its `next()` method.
+        ///
+        /// The following example shows how an iterator can be used explicitly to
+        /// emulate a `for`-`in` loop. First, retrieve a sequence's iterator, and
+        /// then call the iterator's `next()` method until it returns `nil`.
+        ///
+        ///     let numbers = [2, 3, 5, 7]
+        ///     var numbersIterator = numbers.makeIterator()
+        ///
+        ///     while let num = numbersIterator.next() {
+        ///         print(num)
+        ///     }
+        ///     // Prints "2"
+        ///     // Prints "3"
+        ///     // Prints "5"
+        ///     // Prints "7"
+        ///
+        /// - Returns: The next element in the underlying sequence, if a next element
+        ///   exists; otherwise, `nil`.
+        public mutating func next() -> (any MTLFunctionLog)?
+
+        /// The type of element traversed by the iterator.
+        @available(iOS 14.0, tvOS 14.0, macOS 11.0, *)
+        public typealias Element = any MTLFunctionLog
+    }
+
+    /// Returns an iterator over the elements of this sequence.
+    public func makeIterator() -> MTLLogContainer.Iterator
+}
+
+@available(macOS 10.11, iOS 8.0, tvOS 8.0, *)
+extension MTLBlitCommandEncoder {
+
+    public func fill(buffer: any MTLBuffer, range: Range<Int>, value: UInt8)
+
+    @available(macOS 10.14, iOS 12.0, tvOS 12.0, *)
+    public func resetCommandsInBuffer(_ buffer: any MTLIndirectCommandBuffer, range: Range<Int>)
+
+    @available(macOS 10.14, iOS 12.0, tvOS 12.0, *)
+    public func copyIndirectCommandBuffer(_ buffer: any MTLIndirectCommandBuffer, sourceRange: Range<Int>, destination: any MTLIndirectCommandBuffer, destinationIndex: Int)
+
+    @available(macOS 10.14, iOS 12.0, tvOS 12.0, *)
+    public func optimizeIndirectCommandBuffer(_ buffer: any MTLIndirectCommandBuffer, range: Range<Int>)
+
+    @available(macOS 11.0, iOS 14.0, tvOS 14.0, *)
+    public func resolveCounters(_ sampleBuffer: any MTLCounterSampleBuffer, range: Range<Int>, destinationBuffer: any MTLBuffer, destinationOffset: Int)
+}
+
+@available(macOS 10.11, iOS 8.0, tvOS 8.0, *)
+extension MTLBuffer {
+
+    @available(macOS 10.12, iOS 10.0, tvOS 10.0, *)
+    public func addDebugMarker(_ marker: String, range: Range<Int>)
+}
+
+@available(macOS 10.11, iOS 8.0, tvOS 8.0, *)
+extension MTLCommandBuffer {
+
+    @available(macOS 11.0, iOS 14.0, tvOS 14.0, *)
+    public var logs: MTLLogContainer { get }
+
+    @available(macOS 15.0, iOS 18.0, tvOS 18.0, *)
+    public func useResidencySets(_ residencySets: [any MTLResidencySet])
+}
+
+@available(macOS 11.0, iOS 14.0, *)
+@available(tvOS, unavailable)
+extension MTLAccelerationStructureCommandEncoder {
+
+    public func useResources(_ resources: [any MTLResource], usage: MTLResourceUsage)
+
+    public func useHeaps(_ heaps: [any MTLHeap])
+}
+
+@available(macOS 11.0, iOS 14.0, *)
+@available(tvOS, unavailable)
+extension MTLVisibleFunctionTable {
+
+    public func setFunctions(_ functions: [(any MTLFunctionHandle)?], range: Range<Int>)
+}
+
+@available(macOS 11.0, iOS 14.0, *)
+@available(tvOS, unavailable)
+extension MTLIntersectionFunctionTable {
+
+    public func setBuffers(_ buffers: [(any MTLBuffer)?], offsets: [Int], range: Range<Int>)
+
+    public func setFunctions(_ functions: [(any MTLFunctionHandle)?], range: Range<Int>)
+
+    public func setVisibleFunctionTables(_ functionTables: [(any MTLVisibleFunctionTable)?], bufferRange: Range<Int>)
+}
+
+@available(macOS 10.11, iOS 8.0, tvOS 8.0, *)
+extension MTLComputeCommandEncoder {
+
+    @available(macOS 10.13, iOS 11.0, tvOS 11.0, *)
+    public func useResources(_ resources: [any MTLResource], usage: MTLResourceUsage)
+
+    @available(macOS 10.13, iOS 11.0, tvOS 11.0, *)
+    public func useHeaps(_ heaps: [any MTLHeap])
+
+    public func setBuffers(_ buffers: [(any MTLBuffer)?], offsets: [Int], range: Range<Int>)
+
+    @available(macOS 14.0, iOS 17.0, tvOS 17.0, *)
+    public func setBuffers(_ buffers: [(any MTLBuffer)?], offsets: [Int], attributeStrides: [Int], range: Range<Int>)
+
+    public func setTextures(_ textures: [(any MTLTexture)?], range: Range<Int>)
+
+    public func setSamplerStates(_ samplers: [(any MTLSamplerState)?], range: Range<Int>)
+
+    public func setSamplerStates(_ samplers: [(any MTLSamplerState)?], lodMinClamps: [Float], lodMaxClamps: [Float], range: Range<Int>)
+
+    @available(macOS 10.14, iOS 12.0, tvOS 12.0, *)
+    public func memoryBarrier(resources: [any MTLResource])
+
+    @available(iOS, introduced: 13.0, deprecated: 14.0, renamed: "executeCommandsInBuffer")
+    @available(tvOS, introduced: 13.0, deprecated: 14.0, renamed: "executeCommandsInBuffer")
+    public func executeCommands(in indirectCommandBuffer: any MTLIndirectCommandBuffer, with executionRange: NSRange)
+
+    @available(iOS, introduced: 13.0, deprecated: 14.0, renamed: "executeCommandsInBuffer")
+    @available(tvOS, introduced: 13.0, deprecated: 14.0, renamed: "executeCommandsInBuffer")
+    public func executeCommands(in indirectCommandbuffer: any MTLIndirectCommandBuffer, indirectBuffer indirectRangeBuffer: any MTLBuffer, indirectBufferOffset: Int)
+
+    @available(iOS 13.0, tvOS 13.0, macOS 11.0, macCatalyst 14.0, *)
+    public func executeCommandsInBuffer(_ buffer: any MTLIndirectCommandBuffer, range: Range<Int>)
+
+    @available(iOS 13.0, tvOS 13.0, macOS 11.0, macCatalyst 14.0, *)
+    public func executeCommandsInBuffer(_ buffer: any MTLIndirectCommandBuffer, indirectBuffer indirectRangeBuffer: any MTLBuffer, offset: Int)
+
+    @available(macOS 11.0, iOS 14.0, *)
+    @available(tvOS, unavailable)
+    public func setVisibleFunctionTables(_ visibleFunctionTables: [(any MTLVisibleFunctionTable)?], bufferRange: Range<Int>)
+
+    @available(macOS 11.0, iOS 14.0, *)
+    @available(tvOS, unavailable)
+    public func setIntersectionFunctionTables(_ intersectionFunctionTables: [(any MTLIntersectionFunctionTable)?], bufferRange: Range<Int>)
+}
+
+@available(macOS 10.11, iOS 8.0, tvOS 8.0, *)
+extension MTLDevice {
+
+    @available(macOS 10.13, iOS 11.0, tvOS 11.0, *)
+    public func getDefaultSamplePositions(sampleCount: Int) -> [MTLSamplePosition]
+
+    @available(macOS 11.0, iOS 14.0, tvOS 14.0, *)
+    public func sampleTimestamps() -> (cpu: MTLTimestamp, gpu: MTLTimestamp)
+
+    public func makeLibrary(data: DispatchData) throws -> any MTLLibrary
+
+    @available(macOS 10.11, macCatalyst 13.0, iOS 9.0, tvOS 9.0, *)
+    public func makeComputePipelineState(descriptor: MTLComputePipelineDescriptor, options: MTLPipelineOption) throws -> (any MTLComputePipelineState, MTLComputePipelineReflection?)
+
+    @available(macOS 10.11, macCatalyst 13.0, iOS 8.0, tvOS 9.0, *)
+    public func makeRenderPipelineState(descriptor: MTLRenderPipelineDescriptor, options: MTLPipelineOption) throws -> (any MTLRenderPipelineState, MTLRenderPipelineReflection?)
+
+    @available(macOS 11.0, macCatalyst 14.0, iOS 11.0, tvOS 14.5, *)
+    public func makeRenderPipelineState(tileDescriptor: MTLTileRenderPipelineDescriptor, options: MTLPipelineOption) throws -> (any MTLRenderPipelineState, MTLRenderPipelineReflection?)
+
+    @available(macOS 13.0, iOS 16.0, *)
+    @available(tvOS, unavailable)
+    public func makeRenderPipelineState(descriptor: MTLMeshRenderPipelineDescriptor, options: MTLPipelineOption) throws -> (any MTLRenderPipelineState, MTLRenderPipelineReflection?)
+}
+
+@available(macOS 11.0, iOS 14.0, tvOS 14.0, *)
+extension MTLCounterSampleBuffer {
+
+    @available(macOS 11.0, iOS 14.0, tvOS 14.0, *)
+    public func resolveCounterRange(_ range: Range<Int>) throws -> Data?
+}
+
+@available(macOS 10.12, iOS 10.0, tvOS 10.0, *)
+extension MTLFunctionConstantValues {
+
+    public func setConstantValues(_ values: UnsafeRawPointer, type: MTLDataType, range: Range<Int>)
+}
+
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, *)
+extension MTLResidencySet {
+
+    @available(macOS 15.0, iOS 18.0, tvOS 18.0, *)
+    public func addAllocations(_ allocations: [any MTLAllocation])
+
+    @available(macOS 15.0, iOS 18.0, tvOS 18.0, *)
+    public func removeAllocations(_ allocations: [any MTLAllocation])
+}
+
+@available(macOS 15.0, iOS 18.0, tvOS 18.0, *)
+extension MTLCommandQueue {
+
+    @available(macOS 15.0, iOS 18.0, tvOS 18.0, *)
+    public func addResidencySets(_ residencySets: [any MTLResidencySet])
+
+    @available(macOS 15.0, iOS 18.0, tvOS 18.0, *)
+    public func removeResidencySets(_ residencySets: [any MTLResidencySet])
+}
+
+@available(macOS 10.13, iOS 11.0, tvOS 11.0, *)
+extension MTLArgumentEncoder {
+
+    public func setBuffers(_ buffers: [(any MTLBuffer)?], offsets: [Int], range: Range<Int>)
+
+    public func setTextures(_ textures: [(any MTLTexture)?], range: Range<Int>)
+
+    public func setSamplerStates(_ samplers: [(any MTLSamplerState)?], range: Range<Int>)
+
+    @available(macOS 10.14, iOS 13.0, tvOS 13.0, *)
+    public func setRenderPipelineStates(_ pipelines: [(any MTLRenderPipelineState)?], range: Range<Int>)
+
+    @available(iOS, introduced: 13.0, deprecated: 14.0, renamed: "setComputePipelineState")
+    @available(tvOS, introduced: 13.0, deprecated: 14.0, renamed: "setComputePipelineState")
+    public func setComputePipelineState(_ pipeline: (any MTLComputePipelineState)?, at index: Int)
+
+    @available(iOS, introduced: 13.0, deprecated: 14.0, renamed: "setComputePipelineStates")
+    @available(tvOS, introduced: 13.0, deprecated: 14.0, renamed: "setComputePipelineStates")
+    public func setComputePipelineStates(_ pipelines: UnsafePointer<(any MTLComputePipelineState)?>, with range: NSRange)
+
+    @available(iOS 13.0, tvOS 13.0, macOS 11.0, macCatalyst 14.0, *)
+    public func setComputePipelineStates(_ pipelines: [(any MTLComputePipelineState)?], range: Range<Int>)
+
+    @available(macOS 10.14, iOS 12.0, tvOS 12.0, *)
+    public func setIndirectCommandBuffers(_ buffers: [(any MTLIndirectCommandBuffer)?], range: Range<Int>)
+
+    @available(macOS 11.0, iOS 14.0, *)
+    @available(tvOS, unavailable)
+    public func setVisibleFunctionTables(_ visibleFunctionTables: [(any MTLVisibleFunctionTable)?], range: Range<Int>)
+
+    @available(macOS 11.0, iOS 14.0, *)
+    @available(tvOS, unavailable)
+    public func setIntersectionFunctionTables(_ intersectionFunctionTables: [(any MTLIntersectionFunctionTable)?], range: Range<Int>)
+}
+
+@available(macOS 10.11, iOS 8.0, tvOS 8.0, *)
+extension MTLRenderCommandEncoder {
+
+    @available(macOS, introduced: 10.13, deprecated: 13.0, message: "Please specify stages with useResources(_:usage:stages:)")
+    @available(iOS, introduced: 11.0, deprecated: 16.0, message: "Please specify stages with useResources(_:usage:stages:)")
+    @available(tvOS, introduced: 11.0, deprecated: 16.0, message: "Please specify stages with useResources(_:usage:stages:)")
+    public func useResources(_ resources: [any MTLResource], usage: MTLResourceUsage)
+
+    @available(macOS, introduced: 10.13, deprecated: 13.0, message: "Please specify stages with useHeaps(_:stages:)")
+    @available(iOS, introduced: 11.0, deprecated: 16.0, message: "Please specify stages with useHeaps(_:stages:)")
+    @available(tvOS, introduced: 11.0, deprecated: 16.0, message: "Please specify stages with useHeaps(_:stages:)")
+    public func useHeaps(_ heaps: [any MTLHeap])
+
+    @available(macOS 10.15, macCatalyst 13.1, iOS 13.0, tvOS 13.0, *)
+    public func useResources(_ resources: [any MTLResource], usage: MTLResourceUsage, stages: MTLRenderStages)
+
+    @available(macOS 10.15, macCatalyst 13.1, iOS 13.0, tvOS 13.0, *)
+    public func useHeaps(_ heaps: [any MTLHeap], stages: MTLRenderStages)
+
+    @available(macOS, introduced: 10.15, deprecated: 13.0, renamed: "useResource(_:usage:stages:)")
+    @available(macCatalyst, introduced: 13.1, deprecated: 16.0, renamed: "useResource(_:usage:stages:)")
+    @available(iOS, introduced: 13.0, deprecated: 16.0, renamed: "useResource(_:usage:stages:)")
+    @available(tvOS, introduced: 13.0, deprecated: 16.0, renamed: "useResource(_:usage:stages:)")
+    public func use(_ resource: any MTLResource, usage: MTLResourceUsage, stages: MTLRenderStages)
+
+    @available(macOS, introduced: 10.15, deprecated: 13.0, renamed: "useResources(_:usage:stages:)")
+    @available(macCatalyst, introduced: 13.1, deprecated: 16.0, renamed: "useResources(_:usage:stages:)")
+    @available(iOS, introduced: 13.0, deprecated: 16.0, renamed: "useResources(_:usage:stages:)")
+    @available(tvOS, introduced: 13.0, deprecated: 16.0, renamed: "useResources(_:usage:stages:)")
+    public func use(_ resources: UnsafePointer<any MTLResource>, count: Int, usage: MTLResourceUsage, stages: MTLRenderStages)
+
+    @available(macOS, introduced: 10.15, deprecated: 13.0, renamed: "useHeap(_:stages:)")
+    @available(macCatalyst, introduced: 13.1, deprecated: 16.0, renamed: "useHeap(_:stages:)")
+    @available(iOS, introduced: 13.0, deprecated: 16.0, renamed: "useHeap(_:stages:)")
+    @available(tvOS, introduced: 13.0, deprecated: 16.0, renamed: "useHeap(_:stages:)")
+    public func use(_ heap: any MTLHeap, stages: MTLRenderStages)
+
+    @available(macOS, introduced: 10.15, deprecated: 13.0, renamed: "useHeaps(_:stages:)")
+    @available(macCatalyst, introduced: 13.1, deprecated: 16.0, renamed: "useHeaps(_:stages:)")
+    @available(iOS, introduced: 13.0, deprecated: 16.0, renamed: "useHeaps(_:stages:)")
+    @available(tvOS, introduced: 13.0, deprecated: 16.0, renamed: "useHeaps(_:stages:)")
+    public func use(_ heaps: UnsafePointer<any MTLHeap>, count: Int, stages: MTLRenderStages)
+
+    @available(macOS 10.13, iOS 12.0, tvOS 14.5, *)
+    public func setViewports(_ viewports: [MTLViewport])
+
+    @available(macOS 10.13, iOS 12.0, tvOS 14.5, *)
+    public func setScissorRects(_ scissorRects: [MTLScissorRect])
+
+    public func setVertexBuffers(_ buffers: [(any MTLBuffer)?], offsets: [Int], range: Range<Int>)
+
+    @available(macOS 14.0, iOS 17.0, tvOS 17.0, *)
+    public func setVertexBuffers(_ buffers: [(any MTLBuffer)?], offsets: [Int], attributeStrides: [Int], range: Range<Int>)
+
+    public func setVertexTextures(_ textures: [(any MTLTexture)?], range: Range<Int>)
+
+    public func setVertexSamplerStates(_ samplers: [(any MTLSamplerState)?], range: Range<Int>)
+
+    public func setVertexSamplerStates(_ samplers: [(any MTLSamplerState)?], lodMinClamps: [Float], lodMaxClamps: [Float], range: Range<Int>)
+
+    public func setFragmentBuffers(_ buffers: [(any MTLBuffer)?], offsets: [Int], range: Range<Int>)
+
+    public func setFragmentTextures(_ textures: [(any MTLTexture)?], range: Range<Int>)
+
+    public func setFragmentSamplerStates(_ samplers: [(any MTLSamplerState)?], range: Range<Int>)
+
+    public func setFragmentSamplerStates(_ samplers: [(any MTLSamplerState)?], lodMinClamps: [Float], lodMaxClamps: [Float], range: Range<Int>)
+
+    @available(iOS 11.0, macOS 11.0, tvOS 14.5, macCatalyst 14.0, *)
+    public func setTileBuffers(_ buffers: [(any MTLBuffer)?], offsets: [Int], range: Range<Int>)
+
+    @available(iOS 11.0, macOS 11.0, tvOS 14.5, macCatalyst 14.0, *)
+    public func setTileTextures(_ textures: [(any MTLTexture)?], range: Range<Int>)
+
+    @available(iOS 11.0, macOS 11.0, tvOS 14.5, macCatalyst 14.0, *)
+    public func setTileSamplerStates(_ samplers: [(any MTLSamplerState)?], range: Range<Int>)
+
+    @available(iOS 11.0, macOS 11.0, tvOS 14.5, macCatalyst 14.0, *)
+    public func setTileSamplerStates(_ samplers: [(any MTLSamplerState)?], lodMinClamps: [Float], lodMaxClamps: [Float], range: Range<Int>)
+
+    @available(macOS 13.0, iOS 16.0, *)
+    @available(tvOS, unavailable)
+    public func setObjectBuffers(_ buffers: [(any MTLBuffer)?], offsets: [Int], range: Range<Int>)
+
+    @available(macOS 13.0, iOS 16.0, *)
+    @available(tvOS, unavailable)
+    public func setObjectTextures(_ textures: [(any MTLTexture)?], range: Range<Int>)
+
+    @available(macOS 13.0, iOS 16.0, *)
+    @available(tvOS, unavailable)
+    public func setObjectSamplerStates(_ samplers: [(any MTLSamplerState)?], range: Range<Int>)
+
+    @available(macOS 13.0, iOS 16.0, *)
+    @available(tvOS, unavailable)
+    public func setObjectSamplerStates(_ samplers: [(any MTLSamplerState)?], lodMinClamps: [Float], lodMaxClamps: [Float], range: Range<Int>)
+
+    @available(macOS 13.0, iOS 16.0, *)
+    @available(tvOS, unavailable)
+    public func setMeshBuffers(_ buffers: [(any MTLBuffer)?], offsets: [Int], range: Range<Int>)
+
+    @available(macOS 13.0, iOS 16.0, *)
+    @available(tvOS, unavailable)
+    public func setMeshTextures(_ textures: [(any MTLTexture)?], range: Range<Int>)
+
+    @available(macOS 13.0, iOS 16.0, *)
+    @available(tvOS, unavailable)
+    public func setMeshSamplerStates(_ samplers: [(any MTLSamplerState)?], range: Range<Int>)
+
+    @available(macOS 13.0, iOS 16.0, *)
+    @available(tvOS, unavailable)
+    public func setMeshSamplerStates(_ samplers: [(any MTLSamplerState)?], lodMinClamps: [Float], lodMaxClamps: [Float], range: Range<Int>)
+
+    @available(macOS 10.14, macCatalyst 14.0, iOS 16.0, *)
+    @available(tvOS, unavailable)
+    public func memoryBarrier(resources: [any MTLResource], after: MTLRenderStages, before: MTLRenderStages)
+
+    @available(macOS 10.14, iOS 12.0, tvOS 12.0, *)
+    public func executeCommandsInBuffer(_ buffer: any MTLIndirectCommandBuffer, range: Range<Int>)
+
+    @available(macOS 10.14, iOS 13.0, tvOS 13.0, *)
+    public func executeCommandsInBuffer(_ buffer: any MTLIndirectCommandBuffer, indirectBuffer indirectRangeBuffer: any MTLBuffer, offset: Int)
+
+    @available(macOS 12.0, iOS 15.0, *)
+    @available(tvOS, unavailable)
+    public func setVertexVisibleFunctionTables(_ functionTables: [(any MTLVisibleFunctionTable)?], bufferRange: Range<Int>)
+
+    @available(macOS 12.0, iOS 15.0, *)
+    @available(tvOS, unavailable)
+    public func setFragmentVisibleFunctionTables(_ functionTables: [(any MTLVisibleFunctionTable)?], bufferRange: Range<Int>)
+
+    @available(macOS 12.0, iOS 15.0, *)
+    @available(tvOS, unavailable)
+    public func setTileVisibleFunctionTables(_ functionTables: [(any MTLVisibleFunctionTable)?], bufferRange: Range<Int>)
+
+    @available(macOS 12.0, iOS 15.0, *)
+    @available(tvOS, unavailable)
+    public func setVertexIntersectionFunctionTables(_ functionTables: [(any MTLIntersectionFunctionTable)?], bufferRange: Range<Int>)
+
+    @available(macOS 12.0, iOS 15.0, *)
+    @available(tvOS, unavailable)
+    public func setFragmentIntersectionFunctionTables(_ functionTables: [(any MTLIntersectionFunctionTable)?], bufferRange: Range<Int>)
+
+    @available(macOS 12.0, iOS 15.0, *)
+    @available(tvOS, unavailable)
+    public func setTileIntersectionFunctionTables(_ functionTables: [(any MTLIntersectionFunctionTable)?], bufferRange: Range<Int>)
+}
+
+@available(macOS 10.14, iOS 12.0, tvOS 12.0, *)
+extension MTLIndirectCommandBuffer {
+
+    public func reset(_ range: Range<Int>)
+
+    @available(macOS, unavailable)
+    @available(macCatalyst, introduced: 14.0, deprecated: 14.0, renamed: "indirectComputeCommandAt")
+    @available(iOS, introduced: 13.0, deprecated: 14.0, renamed: "indirectComputeCommandAt")
+    @available(tvOS, introduced: 13.0, deprecated: 14.0, renamed: "indirectComputeCommandAt")
+    public func indirectComputeCommand(at Index: Int) -> any MTLIndirectComputeCommand
+}
+
+@available(macOS 11.0, iOS 13.0, tvOS 13.0, *)
+extension MTLIndirectComputeCommand {
+
+    @available(macOS, unavailable)
+    @available(macCatalyst, introduced: 14.0, deprecated: 14.0, renamed: "setStageInRegion(_:)")
+    @available(iOS, introduced: 13.0, deprecated: 14.0, renamed: "setStageInRegion(_:)")
+    @available(tvOS, introduced: 13.0, deprecated: 14.0, renamed: "setStageInRegion(_:)")
+    public func setStageIn(_ region: MTLRegion)
+
+    @available(macOS, unavailable)
+    @available(macCatalyst, introduced: 14.0, deprecated: 14.0, renamed: "setThreadgroupMemoryLength(_:index:)")
+    @available(iOS, introduced: 13.0, deprecated: 14.0, renamed: "setThreadgroupMemoryLength(_:index:)")
+    @available(tvOS, introduced: 13.0, deprecated: 14.0, renamed: "setThreadgroupMemoryLength(_:index:)")
+    public func setThreadgroupMemoryLength(_ length: Int, at index: Int)
+}
+
+@available(macOS 10.11, iOS 8.0, tvOS 8.0, *)
+extension MTLRenderPassDescriptor {
+
+    @available(macOS 10.13, iOS 11.0, tvOS 11.0, *)
+    public func setSamplePositions(_ positions: [MTLSamplePosition])
+
+    @available(macOS 10.13, iOS 11.0, tvOS 11.0, *)
+    public func getSamplePositions() -> [MTLSamplePosition]
+}
+
+@available(macOS 10.11, iOS 8.0, tvOS 8.0, *)
+extension MTLTexture {
+
+    @available(macOS 10.11, iOS 9.0, tvOS 9.0, *)
+    public func makeTextureView(pixelFormat: MTLPixelFormat, textureType: MTLTextureType, levels levelRange: Range<Int>, slices sliceRange: Range<Int>) -> (any MTLTexture)?
+
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, *)
+    public func makeTextureView(pixelFormat: MTLPixelFormat, textureType: MTLTextureType, levels levelRange: Range<Int>, slices sliceRange: Range<Int>, swizzle: MTLTextureSwizzleChannels) -> (any MTLTexture)?
+}
+
+@available(macOS 10.15.4, macCatalyst 13.4, iOS 13.0, *)
+extension MTLRasterizationRateSampleArray {
+
+    public subscript(index: Int) -> Float
+}
+
+@available(macOS 10.15.4, macCatalyst 13.4, iOS 13.0, *)
+extension MTLRasterizationRateLayerDescriptor {
+
+    public convenience init(horizontal: [Float], vertical: [Float])
+}
+
+@available(macOS 10.15.4, macCatalyst 13.4, iOS 13.0, *)
+extension MTLRasterizationRateMapDescriptor {
+
+    public convenience init(screenSize: MTLSize, label: String? = nil)
+
+    public convenience init(screenSize: MTLSize, layer: MTLRasterizationRateLayerDescriptor, label: String? = nil)
+
+    public convenience init(screenSize: MTLSize, layers: [MTLRasterizationRateLayerDescriptor], label: String? = nil)
+}
+
